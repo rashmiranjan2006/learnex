@@ -205,6 +205,211 @@
         }
 
 
+          /* --- Global Variables & Reset (from original code) --- */
+        :root {
+            --primary-blue: #007bff; /* Primary brand color */
+            --dark-blue: #0a1f44; /* Darker blue for background and text */
+            --light-gray: #f8f9fa;
+            --white: #ffffff;
+            --text-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            /* Center the login form */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        /* --- 1. Navbar (Minimal for Login Page) --- */
+        .navbar {
+            background-color: var(--white);
+            padding: 15px 0;
+            position: absolute; /* Changed from fixed to absolute for simple login view */
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--dark-blue);
+        }
+
+        .navbar .logo img {
+            margin-right: 10px;
+            border-radius: 5px;
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        /* --- Login Form Container Styles (Matching Sign-Up) --- */
+        .login-container {
+            background-color: var(--white);
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            width: 100%;
+            max-width: 450px; /* Slightly narrower than sign-up for typical login flow */
+            margin: 40px auto;
+            margin-top: 120px; /* Space from absolute navbar */
+        }
+
+        .login-container h1 {
+            font-size: 2.2rem;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 40px;
+        }
+
+        /* Form Group Styles (Matching Sign-Up) */
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #495057;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input::placeholder {
+            color: #adb5bd;
+        }
+
+        .form-group input:focus {
+            border-color: #80bdff;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* Forgot Password/Remember Me Layout */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .form-options a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .form-options a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        
+        /* Checkbox Styling (Simple Customization) */
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: #6c757d;
+        }
+        .remember-me input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+
+        /* Login Button (Matching Sign-Up Button) */
+        .login-button {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        }
+
+        .login-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Sign-Up Link (Matching Login Link in Sign-Up Page) */
+        .signup-link {
+            margin-top: 30px;
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+
+        .signup-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .signup-link a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+
         /* --- Responsive Design --- */
         @media (max-width: 1024px) {
             .navbar nav ul {
@@ -222,6 +427,37 @@
             }
 
         }
+
+                @media (max-width: 600px) {
+            .login-container {
+                margin: 20px;
+                padding: 30px;
+            }
+
+            .login-container h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 30px;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+            }
+
+            .form-group input {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .login-button {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -249,7 +485,36 @@
  </style>
 </head>
 <body>
+    <div class="login-container">
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Log in to your Learnex account</p>
 
+        <form class="login-form">
+            <div class="form-group">
+                <label for="emailAddress">Email Address</label>
+                <input type="email" id="emailAddress" placeholder="your.email@example.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password">
+            </div>
+
+            <div class="form-options">
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember Me</label>
+                </div>
+                <a href="#">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="login-button">Log In</button>
+        </form>
+
+        <p class="signup-link">
+            Don't have an account? <a href="#">Sign up here</a>
+        </p>
+    </div>
+    
 
     <footer class="main-footer">
              <div class="container">
@@ -303,5 +568,47 @@
 </div>
  </footer>
 
+
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

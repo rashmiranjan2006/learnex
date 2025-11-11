@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnex</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- Global Variables & Reset --- */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-blue: #007bff; /* Primary brand color */
+            --dark-blue: #0a1f44; /* Darker blue for background and text */
+            --light-gray: #f8f9fa;
+            --white: #ffffff;
+            --text-color: #333;
+            --section-bg: #f5f8ff; /* Light blue background for the features section */
+            --card-bg: #ffffff;
+            --spark-yellow: #ffc107;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+            background-color: var(--light-gray);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- 1. Navbar --- */
+        .navbar {
+            background-color: var(--white);
+            color: var(--dark-blue);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--dark-blue);
+        }
+
+        .navbar .logo img {
+            margin-right: 10px;
+            border-radius: 5px;
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .navbar nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar nav ul {
+            list-style: none;
+            display: flex;
+            margin-right: 20px;
+        }
+
+        .navbar nav ul li {
+            margin-left: 30px;
+        }
+
+        .navbar nav ul li a {
+            color: var(--dark-blue);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+        }
+
+        .navbar nav ul li a:hover,
+        .navbar nav ul li a.active {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--primary-blue);
+        }
+
+        .signup-button {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .signup-button:hover {
+            background-color: #0056b3;
+        }
+
+         /* --- Footer Section (New Styles) --- */
+        .main-footer {
+            background-color: var(--light-gray);
+            color: #666;
+            padding-top: 60px;
+            font-size: 0.95rem;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        .footer-column {
+            flex: 1;
+            min-width: 250px;
+        }
+        .footer-column h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+        }
+        .footer-column p {
+            margin-bottom: 10px;
+        }
+        .footer-column a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .footer-column a:hover {
+            color: var(--primary-blue);
+        }
+        .quick-links-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 0;
+            list-style: none;
+            padding-left: 0;
+        }
+        .quick-links-grid li {
+            margin: 0;
+            padding: 0;
+        }
+        .connect-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .connect-links a {
+            font-size: 1.2rem;
+        }
+
+        .email-link {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .email-link i {
+            margin-right: 8px;
+            font-size: 1rem;
+            color: var(--primary-blue);
+        }
+        .copyright {
+            border-top: 1px solid #ddd;
+            text-align: left;
+            padding: 20px 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        /* Override styles for specific footer text as seen in the image */
+        .footer-academy-info {
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+        .data-statement {
+            font-style: italic;
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+
+        /* --- Responsive Design --- */
+        @media (max-width: 1024px) {
+            .navbar nav ul {
+                display: none; /* Hide nav links on smaller screens */
+            }
+            .navbar .container {
+                justify-content: space-around;
+            }
+              .footer-content {
+                justify-content: space-around;
+            }
+            .footer-column {
+                min-width: 200px;
+                flex: none;
+            }
+
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <img src="images/logo.png" alt="Learnex Logo" width="48" height="48" style="object-fit:contain;" loading="lazy">
+                Learnex
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+            <!--     <li><a href="#">Courses</a></li>
+                    <li><a href="#">Live Classes</a></li>
+                    <li><a href="#">Teachers</a></li>  -->
+                    <li><a href="stories.html">Stories</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <button class="signup-button">Sign Up</button>
+            </nav>
+        </div>
+    </header>
+        <!-- Learnex Hero Section -->
+        <section class="about-hero" style="background: linear-gradient(180deg, #2176ff 0%, #1a5dcc 100%); padding: 70px 0 48px 0; text-align: center; color: #fff;">
+            <div class="container" style="max-width: 900px; margin: 0 auto;">
+                <h1 style="font-size: 3.5rem; font-weight: 800; margin-bottom: 18px; letter-spacing: -2px;">About Learnex</h1>
+                <p style="font-size: 1.5rem; font-weight: 400; line-height: 1.3; max-width: 700px; margin: 0 auto;">Transforming education through personalized learning and innovative teaching methods</p>
+            </div>
+        </section>
+
+             
+        <!-- Mission Section -->
+        <section class="mission-section" style="background: #fff; padding: 56px 0 32px 0;">
+            <div class="container" style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; max-width: 1200px;">
+                <div style="flex: 1 1 340px; min-width: 320px; max-width: 540px; margin-right: 32px;">
+                    <h2 style="font-size: 2.1rem; font-weight: 800; margin-bottom: 24px; color: #111;">Our Mission</h2>
+                    <p style="font-size: 1.13rem; color: #4a5a6a; margin-bottom: 18px;">At Sparks Academy, we believe every student deserves access to quality education that adapts to their unique learning style and pace.</p>
+                    <p style="font-size: 1.13rem; color: #4a5a6a;">We combine cutting-edge AI technology with proven teaching methodologies to create personalized learning experiences that empower students to reach their full potential.</p>
+                </div>
+                <div style="flex: 1 1 320px; min-width: 280px; max-width: 420px; background: #f7faff; border-radius: 18px; box-shadow: 0 2px 16px rgba(33, 118, 255, 0.07); padding: 36px 28px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 32px 36px;">
+                        <div style="text-align: center; min-width: 120px;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #2176ff;">1+</div>
+                            <div style="font-size: 1.08rem; color: #4a5a6a; margin-top: 4px;">Years Experience</div>
+                        </div>
+                        <div style="text-align: center; min-width: 120px;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #2176ff;">20+</div>
+                            <div style="font-size: 1.08rem; color: #4a5a6a; margin-top: 4px;">Students Taught</div>
+                        </div>
+                        <div style="text-align: center; min-width: 120px;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #2176ff;">20+</div>
+                            <div style="font-size: 1.08rem; color: #4a5a6a; margin-top: 4px;">Families Trust Us</div>
+                        </div>
+                        <div style="text-align: center; min-width: 120px;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #2176ff;">98%</div>
+                            <div style="font-size: 1.08rem; color: #4a5a6a; margin-top: 4px;">Success Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+                        <!-- Meet Our Founder Section -->
+                <section class="founder-section" style="background: #fafbfc; padding: 64px 0 48px 0;">
+                    <div class="container" style="max-width: 1100px; margin: 0 auto;">
+                        <h2 style="font-size: 2.2rem; font-weight: 800; text-align: center; color: #111; margin-bottom: 8px;">Meet Our Founder</h2>
+                        <div style="text-align: center; margin-bottom: 18px;">
+                                <img src="images/founder.png" alt="Rashmi Ranjan Sahu" style="width: 148px; height: 148px; object-fit: cover; border-radius: 50%; border: 5px solid #fff; box-shadow: 0 4px 18px rgba(33,118,255,0.13); background: #eaf1fb; display: block; margin: 0 auto 18px auto;" loading="lazy">
+                            <div style="color: #7a8ca3; font-size: 1.25rem; font-weight: 500;">Rashmi Ranjan Sahu</div>
+                        </div>
+                        <div style="background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(33, 118, 255, 0.07); padding: 38px 36px 32px 36px; max-width: 1000px; margin: 0 auto;">
+                            <p style="font-size: 1.18rem; color: #6a7a8c; margin-bottom: 22px; line-height: 1.6;">
+Learnex is a next-generation learning platform designed to make education smarter, simpler, and more interactive. With live classes, AI-powered recommendations, and real-time collaboration tools, Learnex transforms the way students learn and teachers teach — bringing classrooms to life anytime, anywhere.                            </p>
+                            <p style="font-size: 1.18rem; color: #6a7a8c; margin-bottom: 0; line-height: 1.6;">
+                                "Every student has the potential to excel. Our role is to provide the right tools, guidance, and support to help them discover and unleash that potential."
+                            </p>
+                            <div style="text-align: right; margin-top: 24px; font-size: 1.08rem; font-weight: 700; color: #222;">&mdash; Rashmi Ranjan Sahu</div>
+                        </div>
+                    </div>
+                </section>
+
+                   <!-- Our Core Values Section -->
+                <section class="core-values-section" style="background: #fafbfc; padding: 48px 0 56px 0;">
+                    <div class="container" style="max-width: 1200px; margin: 0 auto;">
+                        <h2 style="font-size: 2.1rem; font-weight: 800; text-align: center; color: #111; margin-bottom: 38px;">Our Core Values</h2>
+                        <div style="display: flex; flex-wrap: wrap; gap: 32px; justify-content: center;">
+                            <!-- Empathy-Driven Design -->
+                            <div style="background: #f7faff; border-radius: 18px; box-shadow: 0 2px 16px rgba(33, 118, 255, 0.07); padding: 36px 28px; min-width: 290px; max-width: 370px; flex: 1 1 320px; display: flex; flex-direction: column; align-items: flex-start;">
+                                <div style="background: linear-gradient(135deg, #2176ff 60%, #4f8cff 100%); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+                                    <span style="font-size: 2rem;">❤️</span>
+                                </div>
+                                <div style="font-size: 1.25rem; font-weight: 700; color: #111; margin-bottom: 10px;">Empathy-Driven Design</div>
+                                <div style="font-size: 1.08rem; color: #6a7a8c;">We create supportive learning environments with calm, intuitive interfaces and constructive feedback that encourages growth and builds confidence.</div>
+                            </div>
+                            <!-- Privacy First -->
+                            <div style="background: #f7faff; border-radius: 18px; box-shadow: 0 2px 16px rgba(33, 118, 255, 0.07); padding: 36px 28px; min-width: 290px; max-width: 370px; flex: 1 1 320px; display: flex; flex-direction: column; align-items: flex-start;">
+                                <div style="background: linear-gradient(135deg, #ffb300 60%, #ffd54f 100%); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+                                    <span style="font-size: 2rem;">🔒</span>
+                                </div>
+                                <div style="font-size: 1.25rem; font-weight: 700; color: #111; margin-bottom: 10px;">Privacy First</div>
+                                <div style="font-size: 1.08rem; color: #6a7a8c;">Your learning data stays on your device unless you choose to share it. We prioritize your privacy and security at every step of your learning journey.</div>
+                            </div>
+                            <!-- Scientific Rigor -->
+                            <div style="background: #f7faff; border-radius: 18px; box-shadow: 0 2px 16px rgba(33, 118, 255, 0.07); padding: 36px 28px; min-width: 290px; max-width: 370px; flex: 1 1 320px; display: flex; flex-direction: column; align-items: flex-start;">
+                                <div style="background: linear-gradient(135deg, #2176ff 60%, #4f8cff 100%); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px;">
+                                    <span style="font-size: 2rem;">🧪</span>
+                                </div>
+                                <div style="font-size: 1.25rem; font-weight: 700; color: #111; margin-bottom: 10px;">Scientific Rigor</div>
+                                <div style="font-size: 1.08rem; color: #6a7a8c;">Our teaching methods are grounded in evidence-based learning strategies and continuously refined based on real student outcomes and feedback.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                                <!-- Why Choose Sparks Academy Section -->
+                <section class="why-choose-section" style="background: #fafbfc; padding: 48px 0 56px 0;">
+                    <div class="container" style="max-width: 1200px; margin: 0 auto;">
+                        <h2 style="font-size: 2.1rem; font-weight: 800; text-align: center; color: #111; margin-bottom: 38px;">Why Choose Sparks Academy?</h2>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0 48px; justify-content: center;">
+                            <ul style="flex: 1 1 340px; min-width: 320px; max-width: 500px; list-style: none; padding: 0; margin: 0;">
+                                <li style="display: flex; align-items: flex-start; margin-bottom: 32px;">
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #22c55e; border-radius: 50%; margin-right: 18px; font-size: 1.5rem; color: #fff;">✔️</span>
+                                    <div>
+                                        <div style="font-size: 1.15rem; font-weight: 700; color: #111;">Personalized Learning Paths</div>
+                                        <div style="font-size: 1.05rem; color: #6a7a8c;">AI-powered adaptive learning that adjusts to your pace and style</div>
+                                    </div>
+                                </li>
+                                <li style="display: flex; align-items: flex-start; margin-bottom: 32px;">
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #22c55e; border-radius: 50%; margin-right: 18px; font-size: 1.5rem; color: #fff;">✔️</span>
+                                    <div>
+                                        <div style="font-size: 1.15rem; font-weight: 700; color: #111;">24/7 AI Study Assistant</div>
+                                        <div style="font-size: 1.05rem; color: #6a7a8c;">Get instant help whenever you need it</div>
+                                    </div>
+                                </li>
+                                <li style="display: flex; align-items: flex-start; margin-bottom: 0;">
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #22c55e; border-radius: 50%; margin-right: 18px; font-size: 1.5rem; color: #fff;">✔️</span>
+                                    <div>
+                                        <div style="font-size: 1.15rem; font-weight: 700; color: #111;">Progress Tracking</div>
+                                        <div style="font-size: 1.05rem; color: #6a7a8c;">Monitor your improvement with detailed analytics</div>
+                                    </div>
+                                </li>
+                            </ul>
+                            <ul style="flex: 1 1 340px; min-width: 320px; max-width: 500px; list-style: none; padding: 0; margin: 0;">
+                                <li style="display: flex; align-items: flex-start; margin-bottom: 32px;">
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #22c55e; border-radius: 50%; margin-right: 18px; font-size: 1.5rem; color: #fff;">✔️</span>
+                                    <div>
+                                        <div style="font-size: 1.15rem; font-weight: 700; color: #111;">Expert Instructors</div>
+                                        <div style="font-size: 1.05rem; color: #6a7a8c;">Learn from certified educators with proven track records</div>
+                                    </div>
+                                </li>
+                                <li style="display: flex; align-items: flex-start; margin-bottom: 32px;">
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #22c55e; border-radius: 50%; margin-right: 18px; font-size: 1.5rem; color: #fff;">✔️</span>
+                                    <div>
+                                        <div style="font-size: 1.15rem; font-weight: 700; color: #111;">Interactive Live Classes</div>
+                                        <div style="font-size: 1.05rem; color: #6a7a8c;">Engage in real-time with teachers and peers</div>
+                                    </div>
+                                </li>
+                                <li style="display: flex; align-items: flex-start; margin-bottom: 0;">
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #22c55e; border-radius: 50%; margin-right: 18px; font-size: 1.5rem; color: #fff;">✔️</span>
+                                    <div>
+                                        <div style="font-size: 1.15rem; font-weight: 700; color: #111;">Flexible Learning</div>
+                                        <div style="font-size: 1.05rem; color: #6a7a8c;">Study at your own pace, anytime, anywhere</div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+    </body>  
+ </style>
+</head>
+<body>
+
+
+    <footer class="main-footer">
+             <div class="container">
+             <div class="footer-content">
+ 
+              <div class="footer-column">
+          <h4>Learnex</h4>
+    <p class="footer-academy-info">
+      Personalized learning support with live classes and AI assistance.
+    </p>
+    <p class="data-statement">
+ Data stays on your browser unless you choose to share.
+    </p>
+</div>
+
+ <div class="footer-column">
+ <h4>Quick Links</h4>
+ <ul class="quick-links-grid">
+ <li><a href="index.html">Home</a></li>
+<!-- <li><a href="courses.html">Courses</a></li>
+ <li><a href="live-classes.html">Live Classes</a></li>
+ <li><a href="teachers.html">Teachers</a></li>-->
+ <li><a href="stories.html">Stories</a></li>
+<li><a href="about.html">About</a></li>
+ <li><a href="contact.html">Contact</a></li>
+ </ul>
+<p><a href="privacy.html">Privacy Policy</a></p>
+<p><a href="terms.html">Terms of Service</a></p>
+</div>
+
+<div class="footer-column">
+<h4>Connect With Us</h4>
+<a href="mailto:support@learnex.com" class="email-link">
+ <i class="fas fa-envelope"></i> support@learnex.com
+</a>
+ <div class="connect-links">
+ <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+<a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+ <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+</div>
+ <p style="margin-top: 30px; line-height: 1.5;">
+ Accessibility statement: We strive to make our platform accessible to all learners.
+</p>
+ </div>
+
+</div>
+
+ <div class="copyright">
+ &copy; 2025 Learnex Academy. All rights reserved.
+ </div>
+</div>
+ </footer>
+
+</body>
+</html>

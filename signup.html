@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnex - Sign Up</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- Global Variables & Reset --- */
+        :root {
+            --primary-blue: #007bff; /* Primary brand color */
+            --dark-blue: #0a1f44; /* Darker blue for background and text */
+            --light-gray: #f8f9fa;
+            --white: #ffffff;
+            --text-color: #333;
+            --section-bg: #f5f8ff; /* Light blue background for the features section */
+            --card-bg: #ffffff;
+            --spark-yellow: #ffc107;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+            background-color: var(--light-gray);
+            /* Centering the signup form content */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%; /* Ensures container spans full width up to max-width */
+        }
+        
+        /* --- Main Sign-Up Layout --- */
+        .page-content {
+            flex-grow: 1; /* Makes the content section take up vertical space */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 120px; /* 120px gap from header */
+            padding-bottom: 50px;
+        }
+
+        /* --- 1. Navbar --- */
+        .navbar {
+            background-color: var(--white);
+            color: var(--dark-blue);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+            font-size: 24px;
+            color: var(--dark-blue);
+        }
+
+        .navbar .logo img {
+            margin-right: 10px;
+            border-radius: 5px;
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .navbar nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar nav ul {
+            list-style: none;
+            display: flex;
+            margin-right: 20px;
+        }
+
+        .navbar nav ul li {
+            margin-left: 30px;
+        }
+
+        .navbar nav ul li a {
+            color: var(--dark-blue);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 5px 0;
+            transition: color 0.3s ease;
+        }
+
+        .navbar nav ul li a:hover,
+        .navbar nav ul li a.active {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--primary-blue);
+        }
+
+        .signup-button {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .signup-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- Sign-Up Form Styles (Sparks Academy) --- */
+        .signup-container {
+            background-color: var(--white);
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .signup-container h1 {
+            font-size: 2.2rem;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #6c757d;
+            margin-bottom: 40px;
+        }
+
+        /* Role Selection Styles */
+        .role-selection {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .role-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 0;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .role-option i {
+            font-size: 2.2rem;
+            color: #ced4da;
+            margin-bottom: 8px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .role-option span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: color 0.3s ease;
+        }
+
+        .role-option.active i {
+            color: var(--primary-blue);
+            transform: scale(1.1);
+        }
+
+        .role-option.active span {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        /* Role Slider Styles */
+        .role-slider-wrapper {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .role-slider {
+            height: 100%;
+            width: 33.33%;
+            background-color: var(--primary-blue);
+            border-radius: 3px;
+            position: absolute;
+            left: 0;
+            transition: left 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Circle indicator on the slider */
+        .role-slider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+            background-color: var(--primary-blue);
+            border: 3px solid var(--white);
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-sizing: border-box;
+        }
+
+
+        /* Form Group Styles */
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #495057;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input::placeholder {
+            color: #adb5bd;
+        }
+
+        .form-group input:focus {
+            border-color: #80bdff;
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* Role Info Messages */
+        .role-info {
+            background-color: #e7f3ff;
+            border-left: 5px solid var(--primary-blue);
+            padding: 15px 20px;
+            margin-top: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #004085;
+            display: none;
+        }
+
+        .role-info p {
+            margin: 0;
+        }
+
+        /* Sign Up Button */
+        .signup-button#signupBtn { /* Use ID to distinguish from navbar button */
+            background-color: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+            margin-top: 20px;
+        }
+
+        .signup-button#signupBtn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Login Link */
+        .login-link {
+            margin-top: 30px;
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+
+        .login-link a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* --- Footer Section --- */
+        .main-footer {
+            background-color: var(--light-gray);
+            color: #666;
+            padding-top: 60px;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        .footer-column {
+            flex: 1;
+            min-width: 250px;
+        }
+        .footer-column h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+        }
+        .footer-column a {
+            color: #666;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .footer-column a:hover {
+            color: var(--primary-blue);
+        }
+        .quick-links-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 0;
+            list-style: none;
+            padding-left: 0;
+        }
+        .email-link {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .email-link i {
+            margin-right: 8px;
+            font-size: 1rem;
+            color: var(--primary-blue);
+        }
+        .connect-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .connect-links a {
+            font-size: 1.2rem;
+        }
+        .copyright {
+            border-top: 1px solid #ddd;
+            text-align: left;
+            padding: 20px 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .footer-academy-info {
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+        .data-statement {
+            font-style: italic;
+            font-size: 0.85rem;
+            color: #999;
+        }
+
+
+        /* --- Responsive Design --- */
+        @media (max-width: 1024px) {
+            .navbar nav ul {
+                display: none; /* Hide nav links on smaller screens */
+            }
+            .navbar .container {
+                justify-content: space-around;
+            }
+            .footer-content {
+                justify-content: space-around;
+            }
+            .footer-column {
+                min-width: 200px;
+                flex: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .signup-container {
+                margin: 20px;
+                padding: 30px;
+            }
+
+            .signup-container h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 30px;
+            }
+
+            .role-option i {
+                font-size: 1.8rem;
+            }
+
+            .role-option span {
+                font-size: 0.8rem;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+            }
+
+            .form-group input {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .signup-button#signupBtn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <img src="images/logo.png" alt="Learnex Logo" width="48" height="48" style="object-fit:contain;" loading="lazy">
+                Learnex
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="stories.html">Stories</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <button class="signup-button">Sign Up</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-content">
+        <div class="signup-container">
+            <h1>Join Learnex</h1>
+            <p class="subtitle">Select your role and create your account</p>
+
+            <div class="role-selection">
+                <div class="role-option" data-role="teacher">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Teacher</span>
+                </div>
+                <div class="role-option active" data-role="student">
+                    <i class="fas fa-user-friends"></i>
+                    <span>Student</span>
+                </div>
+                <div class="role-option" data-role="admin">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Admin</span>
+                </div>
+                <div class="role-slider-wrapper">
+                    <div class="role-slider"></div>
+                </div>
+            </div>
+
+            <form class="signup-form">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="emailAddress">Email Address</label>
+                    <input type="email" id="emailAddress" placeholder="your.email@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Minimum 6 characters">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Re-enter your password">
+                </div>
+
+                <div class="role-info" id="teacher-info">
+                    <p><strong>Teacher Registration:</strong> Your account will be reviewed by our admin team before activation.</p>
+                </div>
+                <div class="role-info" id="admin-info">
+                    <p><strong>Admin Registration:</strong> This requires special authorization. Contact support for access.</p>
+                </div>
+
+                <button type="submit" class="signup-button" id="signupBtn">Sign Up as Student</button>
+            </form>
+
+            <p class="login-link">Already have an account? <a href="login.html">Log in here</a></p>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h4>Learnex</h4>
+                    <p class="footer-academy-info">
+                        Personalized learning support with live classes and AI assistance.
+                    </p>
+                    <p class="data-statement">
+                        Data stays on your browser unless you choose to share.
+                    </p>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Quick Links</h4>
+                    <ul class="quick-links-grid">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="stories.html">Stories</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Connect With Us</h4>
+                    <a href="mailto:support@learnex.com" class="email-link">
+                        <i class="fas fa-envelope"></i> support@learnex.com
+                    </a>
+                    <div class="connect-links">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                    <p style="margin-top: 30px; line-height: 1.5;">
+                        Accessibility statement: We strive to make our platform accessible to all learners.
+                    </p>
+                </div>
+            </div>
+
+            <div class="copyright">
+                &copy; 2025 Learnex Academy. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const roleOptions = document.querySelectorAll('.role-option');
+            const roleSlider = document.querySelector('.role-slider');
+            const signupBtn = document.getElementById('signupBtn');
+            const teacherInfo = document.getElementById('teacher-info');
+            const adminInfo = document.getElementById('admin-info');
+
+            // Function to update the slider position and active state
+            const updateSlider = (selectedRoleElement) => {
+                const role = selectedRoleElement.dataset.role;
+                const index = Array.from(roleOptions).indexOf(selectedRoleElement);
+                
+                // Calculate the left position for the slider (0% for Teacher, 33.33% for Student, 66.66% for Admin)
+                const sliderWidthPercentage = 100 / roleOptions.length;
+                roleSlider.style.left = `${index * sliderWidthPercentage}%`;
+
+                // Update active class for role options
+                roleOptions.forEach(option => option.classList.remove('active'));
+                selectedRoleElement.classList.add('active');
+
+                // Update button text and info messages
+                signupBtn.textContent = `Sign Up as ${role.charAt(0).toUpperCase() + role.slice(1)}`;
+                
+                teacherInfo.style.display = 'none';
+                adminInfo.style.display = 'none';
+
+                if (role === 'teacher') {
+                    teacherInfo.style.display = 'block';
+                } else if (role === 'admin') {
+                    adminInfo.style.display = 'block';
+                }
+            };
+
+            // Event listeners for role options
+            roleOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    updateSlider(option);
+                });
+            });
+
+            // Initial setup (select student by default)
+            const initialActiveRole = document.querySelector('.role-option[data-role="student"]');
+            if (initialActiveRole) {
+                updateSlider(initialActiveRole);
+            }
+        });
+    </script>
+</body>
+</html>
