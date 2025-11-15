@@ -9,6 +9,86 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+                @media (max-width: 900px) {
+                    .navbar .container {
+                        flex-direction: column;
+                        align-items: stretch;
+                    }
+                    .navbar .logo img {
+                        width: 32px;
+                        height: 32px;
+                    }
+                    .navbar .logo {
+                        font-size: 1.1rem;
+                    }
+                    .login-button, .signup-button {
+                        font-size: 0.95rem;
+                        padding: 8px 14px;
+                    }
+                }
+                @media (max-width: 600px) {
+                    body {
+                        padding-top: 0;
+                    }
+                    .navbar .container {
+                        flex-direction: column;
+                        align-items: stretch;
+                    }
+                    .navbar .logo img {
+                        width: 28px;
+                        height: 28px;
+                    }
+                    .navbar .logo {
+                        font-size: 1rem;
+                    }
+                    .login-button, .signup-button {
+                        font-size: 0.9rem;
+                        padding: 6px 10px;
+                    }
+                    .page-content {
+                        margin-top: 80px;
+                        padding-bottom: 20px;
+                    }
+                    .signup-container {
+                        margin: 10px auto;
+                        padding: 12px 4px;
+                        max-width: 98vw;
+                        min-width: 0;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                    }
+                    .signup-container h1 {
+                        font-size: 1.1rem;
+                    }
+                    .subtitle {
+                        font-size: 0.8rem;
+                        margin-bottom: 12px;
+                    }
+                    .form-group label {
+                        font-size: 0.75rem;
+                    }
+                    .form-group input, .form-group select {
+                        padding: 7px 7px;
+                        font-size: 0.85rem;
+                    }
+                    .main-footer {
+                        padding-top: 20px;
+                        font-size: 0.8rem;
+                    }
+                    .footer-content {
+                        flex-direction: column;
+                        gap: 8px;
+                        padding-bottom: 8px;
+                    }
+                    .footer-column {
+                        min-width: 0;
+                        width: 100%;
+                        margin-bottom: 8px;
+                    }
+                    .quick-links-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
         /* --- Global Variables & Reset --- */
         :root {
             --primary-blue: #007bff; /* Primary brand color */
@@ -133,6 +213,7 @@
             transition: background-color 0.3s ease;
             text-decoration: none;
             margin-left: 10px;
+            margin-right: 10px;
         }
 
         .login-button:hover {
@@ -597,6 +678,66 @@
                     font-size: 1rem;
                 }
             }
+ .header-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+            }
+            .logo-title {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .site-title {
+                font-weight: 700;
+                font-size: 24px;
+                color: var(--dark-blue);
+            }
+            .logo-title img {
+                margin-right: 0;
+                border-radius: 5px;
+                width: 48px;
+                height: 48px;
+                object-fit: contain;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+            .mobile-login {
+                margin-left: auto;
+            }
+                .header-row {
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                .logo-title img {
+                    width: 32px;
+                    height: 32px;
+                }
+                .site-title {
+                    font-size: 1.1rem;
+                }
+                .mobile-login {
+                    font-size: 0.95rem;
+                    padding: 8px 14px;
+                }
+                .header-row {
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                .logo-title img {
+                    width: 28px;
+                    height: 28px;
+                }
+                .site-title {
+                    font-size: 1rem;
+                }
+                .mobile-login {
+                    font-size: 0.9rem;
+                    padding: 6px 10px;
+                }
+
     </style>
 
 </head>
@@ -604,20 +745,15 @@
 
     <header class="navbar">
         <div class="container">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Learnex Logo" width="48" height="48" style="object-fit:contain;" loading="lazy">
-                Learnex
+            <div class="header-row">
+                <div class="logo-title">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Learnex Logo" width="48" height="48" style="object-fit:contain;" loading="lazy">
+                    <span class="site-title">Learnex</span>
+                </div>
+                <a href="{{ url_for('login') }}" class="login-button mobile-login">login</a>
             </div>
-            <nav>
-                <ul>
-                    <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
-                    <li><a href="{{ url_for('stories') }}" class="{% if request.endpoint == 'stories' %}active{% endif %}">Stories</a></li>
-                    <li><a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About</a></li>
-                    <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact</a></li>
-                </ul>
-                <a href="{{ url_for('login') }}" class="login-button">login</a>
-            </nav>
         </div>
+           
     </header>
 
     <div class="page-content">
