@@ -314,6 +314,69 @@
                 grid-template-columns: 1fr;
             }
         }
+         .header-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+            }
+            .logo-title {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .site-title {
+                font-weight: 700;
+                font-size: 24px;
+                color: var(--dark-blue);
+            }
+            .logo-title img {
+                margin-right: 0;
+                border-radius: 5px;
+                width: 48px;
+                height: 48px;
+                object-fit: contain;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+            .mobile-signup {
+                margin-left: auto;
+            }
+            @media (max-width: 900px) {
+                .header-row {
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                .logo-title img {
+                    width: 32px;
+                    height: 32px;
+                }
+                .site-title {
+                    font-size: 1.1rem;
+                }
+                .mobile-signup {
+                    font-size: 0.95rem;
+                    padding: 8px 14px;
+                }
+            }
+            @media (max-width: 600px) {
+                .header-row {
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                }
+                .logo-title img {
+                    width: 28px;
+                    height: 28px;
+                }
+                .site-title {
+                    font-size: 1rem;
+                }
+                .mobile-signup {
+                    font-size: 0.9rem;
+                    padding: 6px 10px;
+                }
+            }
 
     </style>
 </head>
@@ -323,15 +386,15 @@
     <!-- NAVBAR -->
     <header class="navbar">
         <div class="container">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-                Learnex
+            <div class="header-row">
+                <div class="logo-title">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
+                    <span class="site-title">Learnex</span>
+                </div>
+                <a href="{{ url_for('signup') }}" class="signup-button mobile-signup">Sign Up</a>
             </div>
-
-            <nav>
-                <a href="{{ url_for('signup') }}" class="signup-button">Sign Up</a>
-            </nav>
         </div>
+           
     </header>
 
 
