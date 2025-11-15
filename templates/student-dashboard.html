@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        html, body {
+            height: 100%;
+            min-height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            overflow: hidden;
+        }
+        /* Custom scrollbar for chat */
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background-color: #d1d5db; /* gray-400 */
+            border-radius: 4px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        /* Custom styles for mobile menu transition */
+        .sidebar-open {
+            transform: translateX(0) !important;
+        }
+        .backdrop-visible {
+            opacity: 0.5;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Flex Container - Full screen height, no scroll -->
+    <div class="flex h-screen"> 
+
+        <!-- Mobile Backdrop Overlay (Hidden on SM and up) -->
+        <div id="backdrop" class="fixed inset-0 bg-black opacity-0 z-30 hidden transition-opacity duration-300 sm:hidden" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar Navigation -->
+        <!-- Fixed full height. Hidden on mobile by default (-translate-x-full). Visible/fixed on sm and up (sm:translate-x-0). -->
+        <aside id="sidebar" class="w-64 bg-white shadow-2xl flex flex-col justify-between 
+             fixed h-full z-40 transition-transform duration-300 ease-in-out 
+             -translate-x-full sm:translate-x-0">
+            
+            <!-- Profile Section -->
+            <div class="p-6 border-b border-gray-100 flex-shrink-0">
+                <div class="flex flex-col items-center">
+                    {% if user.photo %}
+                        <img src="{{ user.photo }}" alt="Profile Photo" class="w-16 h-16 rounded-full mb-3 flex-shrink-0 object-cover">
+                    {% else %}
+                        <div class="w-16 h-16 bg-[#3264e0] text-white flex items-center justify-center rounded-full text-xl font-bold mb-3 flex-shrink-0">
+                            {{ user.name[0]|upper if user and user.name else '?' }}
+                        </div>
+                    {% endif %}
+                    <div class="text-center">
+                        <div class="text-base font-semibold text-gray-800 truncate" title="{{ user.name if user else '' }}">{{ user.name if user else 'Student Name' }}</div>
+                        <div class="text-xs text-gray-500 truncate mb-3" title="{{ user.email if user else '' }}">{{ user.email if user else 'student@email.com' }}</div>
+                        <button data-view="profile" class="nav-item px-3 py-1.5 w-full text-sm text-gray-700 bg-white hover:bg-gray-100 rounded-lg transition-colors border border-gray-200">
+                            <i class="fas fa-user-circle mr-2"></i><span>View Profile</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-grow overflow-y-auto">
+                <ul class="space-y-1 p-4">
+                    <li data-view="teachers" class="nav-item active cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 rounded-lg transition-colors bg-[#ffeecc] text-[#1a2340] font-semibold">
+                        <i class="fas fa-chalkboard-teacher w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">Teachers</span>
+                    </li>
+                    <li data-view="live-class" class="nav-item cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-video w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">Live Class</span>
+                    </li>
+                    <li data-view="courses" class="nav-item cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-book-open w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">Courses</span>
+                    </li>
+                    <li data-view="whiteboard" class="nav-item cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-paint-brush w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">Whiteboard</span>
+                    </li>
+                    <li data-view="chat-bot" class="nav-item cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-robot w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">AI Chat Bot</span>
+                    </li>
+                    <li data-view="attendance" class="nav-item cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-calendar-alt w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">Attendance</span>
+                    </li>
+                    <li data-view="results" class="nav-item cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-award w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">Results</span>
+                    </li>
+                    <li data-view="assignment" class="nav-item cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-file-alt w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">Assignment</span>
+                    </li>
+                    <li data-view="calculator" class="nav-item cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-calculator w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">Calculator</span>
+                    </li>
+                    <li data-view="formula-charts" class="nav-item cursor-pointer flex items-center p-3 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                        <i class="fas fa-chart-bar w-5 h-5 flex-shrink-0"></i>
+                        <span class="ml-3">Formula Charts</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Logout Button -->
+            <div class="p-6 border-t border-gray-100 flex-shrink-0">
+                <button class="w-full flex items-center justify-start px-3 py-2 text-sm font-medium text-red-600 bg-white hover:bg-red-50 rounded-lg transition-colors">
+                    <i class="fas fa-sign-out-alt w-5 h-5 flex-shrink-0"></i>
+                    <span class="ml-3">Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper (Margin adjustment only applies on SM and up) -->
+        <div class="flex-1 ml-0 sm:ml-64 flex flex-col h-full transition-all duration-300">
+            
+            <!-- Header (FIXED relative to this column, flex-shrink-0) -->
+            <header class="flex-shrink-0 bg-white shadow-sm pt-4 pb-4 border-b border-gray-200 flex items-center px-4 sm:px-8">
+                <!-- Mobile Menu Toggle Button (Visible only on mobile) -->
+                <button id="menu-toggle" class="sm:hidden p-2 mr-3 text-gray-600 hover:text-gray-800 rounded-lg">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+
+                <i class="fas fa-graduation-cap text-xl text-gray-500 mr-3"></i>
+                <h2 class="text-xl font-medium text-gray-800">Student Dashboard</h2> 
+            </header>
+
+            <!-- Scrollable Content Area (flex-1 overflow-y-auto ensures only this area scrolls) -->
+            <main id="content-area" class="flex-1 overflow-y-auto p-4 sm:p-8 bg-[#f8fafc]">
+                <!-- Content Views Container -->
+                <div class="content-container">
+                    <!-- Live Class View -->
+                    <div id="live-class-view" class="content-view hidden">
+                        <!-- Upcoming Live Sessions Section -->
+                        <section style="background:#fff;padding:0 0 0 0;">
+                            <div class="container" style="max-width:1300px;margin:0 auto;padding-bottom:64px;">
+                                <h2 style="font-size:2.2rem;font-weight:800;color:#0f1724;margin-bottom:32px;margin-top:32px;text-align:left;">Upcoming Live Sessions</h2>
+                                <div style="display:flex;gap:32px;justify-content:flex-start;align-items:stretch;flex-wrap:wrap;">
+                                    <!-- Card 1 -->
+                                    <div style="background:#f4f6fd;border-radius:16px;box-shadow:0 2px 12px 0 rgba(30,42,90,0.06);width:370px;overflow:hidden;display:flex;flex-direction:column;border:1.5px solid #e3e8f0;">
+                                        <div style="background:#e7edfd;padding:18px 22px 10px 22px;display:flex;align-items:center;justify-content:space-between;">
+                                            <span style="font-size:1.18rem;font-weight:700;color:#1a2340;">Mathematics - Calculus</span>
+                                            <span style="background:#22c55e;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 16px;border-radius:8px;">Live</span>
+                                        </div>
+                                        <div style="background:#e7edfd;padding:0 22px 10px 22px;color:#6b7280;font-size:1.05rem;">Advanced Differentiation Techniques</div>
+                                        <div style="padding:18px 22px 22px 22px;flex:1;display:flex;flex-direction:column;gap:8px;">
+                                            <div><b>Teacher:</b> Dr. Priya Sharma</div>
+                                            <div><b>Date:</b> Today, 4:00 PM - 5:30 PM</div>
+                                            <div><b>Level:</b> Grade 11-12</div>
+                                            <div><b>Students:</b> 24/30 enrolled</div>
+                                            <button style="margin-top:18px;background:#1754d4;color:#fff;font-weight:600;font-size:1.08rem;padding:12px 0;border-radius:12px;border:none;outline:none;box-shadow:none;transition:background 0.2s;cursor:pointer;width:100%;">Join Class</button>
+                                        </div>
+                                    </div>
+                                    <!-- Card 2 -->
+                                    <div style="background:#f4f6fd;border-radius:16px;box-shadow:0 2px 12px 0 rgba(30,42,90,0.06);width:370px;overflow:hidden;display:flex;flex-direction:column;border:1.5px solid #e3e8f0;">
+                                        <div style="background:#e7edfd;padding:18px 22px 10px 22px;display:flex;align-items:center;justify-content:space-between;">
+                                            <span style="font-size:1.18rem;font-weight:700;color:#1a2340;">Physics - Mechanics</span>
+                                            <span style="background:#fde68a;color:#1a2340;font-size:0.98rem;font-weight:600;padding:4px 16px;border-radius:8px;">Tomorrow</span>
+                                        </div>
+                                        <div style="background:#e7edfd;padding:0 22px 10px 22px;color:#6b7280;font-size:1.05rem;">Newton's Laws & Applications</div>
+                                        <div style="padding:18px 22px 22px 22px;flex:1;display:flex;flex-direction:column;gap:8px;">
+                                            <div><b>Teacher:</b> Prof. Rajesh Kumar</div>
+                                            <div><b>Date:</b> Tomorrow, 3:00 PM - 4:30 PM</div>
+                                            <div><b>Level:</b> Grade 10-11</div>
+                                            <div><b>Students:</b> 18/25 enrolled</div>
+                                            <button style="margin-top:18px;background:#2563eb;color:#fff;font-weight:600;font-size:1.08rem;padding:12px 0;border-radius:12px;border:none;outline:none;box-shadow:none;transition:background 0.2s;cursor:pointer;width:100%;">Reserve Seat</button>
+                                        </div>
+                                    </div>
+                                    <!-- Card 3 -->
+                                    <div style="background:#f4f6fd;border-radius:16px;box-shadow:0 2px 12px 0 rgba(30,42,90,0.06);width:370px;overflow:hidden;display:flex;flex-direction:column;border:1.5px solid #e3e8f0;">
+                                        <div style="background:#e7edfd;padding:18px 22px 10px 22px;display:flex;align-items:center;justify-content:space-between;">
+                                            <span style="font-size:1.18rem;font-weight:700;color:#1a2340;">Chemistry - Organic</span>
+                                            <span style="background:#e5e7eb;color:#1a2340;font-size:0.98rem;font-weight:600;padding:4px 16px;border-radius:8px;">Fri, 5 PM</span>
+                                        </div>
+                                        <div style="background:#e7edfd;padding:0 22px 10px 22px;color:#6b7280;font-size:1.05rem;">Nomenclature & Reactions</div>
+                                        <div style="padding:18px 22px 22px 22px;flex:1;display:flex;flex-direction:column;gap:8px;">
+                                            <div><b>Teacher:</b> Dr. Anita Verma</div>
+                                            <div><b>Date:</b> Friday, 5:00 PM - 6:30 PM</div>
+                                            <div><b>Level:</b> Grade 11-12</div>
+                                            <div><b>Students:</b> 12/20 enrolled</div>
+                                            <button style="margin-top:18px;background:#2563eb;color:#fff;font-weight:600;font-size:1.08rem;padding:12px 0;border-radius:12px;border:none;outline:none;box-shadow:none;transition:background 0.2s;cursor:pointer;width:100%;">Reserve Seat</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Profile View -->
+                    <div id="profile-view" class="content-view hidden">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">My Profile</h1>
+                        <p class="text-gray-500 text-lg mb-8">Manage your personal information</p>
+                        <!-- Profile details here, but no edit form or modal visible by default -->
+                        <div class="flex flex-wrap lg:flex-nowrap gap-8">
+                            <div class="w-full lg:w-1/3 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-6">Profile Picture</h2>
+                                <div class="flex flex-col items-center">
+                                    {% if user.photo %}
+                                        <img src="{{ user.photo }}" alt="Profile Photo" class="w-32 h-32 rounded-full mb-4">
+                                    {% else %}
+                                        <div class="w-32 h-32 bg-gray-200 text-gray-500 flex items-center justify-center rounded-full text-4xl font-bold mb-4">
+                                            {{ user.name[0]|upper if user and user.name else '?' }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="text-lg font-semibold">{{ user.name }}</div>
+                                </div>
+                            </div>
+                            <div class="w-full lg:w-2/3 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <h2 class="text-xl font-semibold text-gray-800 mb-6">Personal Information</h2>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                                        <div class="mt-1">{{ user.name }}</div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                                        <div class="mt-1">{{ user.email }}</div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                                        <div class="mt-1">{{ user.phone or 'Not set' }}</div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">User ID</label>
+                                        <div class="mt-1">{{ user.id }}</div>
+                                    </div>
+                                </div>
+                                <div class="mt-6 flex gap-3">
+                                    <button id="edit-profile-btn" type="button" class="px-6 py-2 text-white bg-[#3264e0] hover:bg-[#254b9d] font-medium rounded-lg shadow-md transition-colors">Edit Profile</button>
+                                </div>
+                                <form id="edit-profile-form" method="post" enctype="multipart/form-data" action="/profile" class="mt-6 space-y-4 hidden bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                                        <input type="text" name="name" value="{{ user.name }}" class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm p-3" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Email</label>
+                                        <input type="email" name="email" value="{{ user.email }}" class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm p-3 bg-gray-100" readonly>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Phone Number</label>
+                                        <input type="text" name="phone" value="{{ user.phone or '' }}" class="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm p-3">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Profile Photo</label>
+                                        <input type="file" name="photo" id="edit-photo" accept="image/*" class="block">
+                                        <img id="photo-preview" src="{{ user.photo or '/static/images/default-profile.png' }}" alt="Profile Photo" class="w-20 h-20 rounded-full mt-2">
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+                                        <button type="button" id="cancel-edit-profile" class="px-4 py-2 rounded bg-gray-200">Cancel</button>
+                                    </div>
+                                </form>
+                            <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Toggle edit profile form
+                                const editBtn = document.getElementById('edit-profile-btn');
+                                const editForm = document.getElementById('edit-profile-form');
+                                const cancelBtn = document.getElementById('cancel-edit-profile');
+                                if (editBtn && editForm) {
+                                    editBtn.addEventListener('click', function() {
+                                        editForm.classList.toggle('hidden');
+                                        editBtn.classList.toggle('hidden');
+                                    });
+                                }
+                                if (cancelBtn && editForm && editBtn) {
+                                    cancelBtn.addEventListener('click', function(e) {
+                                        e.preventDefault();
+                                        editForm.classList.add('hidden');
+                                        editBtn.classList.remove('hidden');
+                                    });
+                                }
+                                // Photo preview
+                                var photoInput = document.getElementById('edit-photo');
+                                if (photoInput) {
+                                    photoInput.addEventListener('change', function(e) {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onload = function(evt) {
+                                                document.getElementById('photo-preview').src = evt.target.result;
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    });
+                                }
+                            });
+                            </script>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance View -->
+                    <div id="attendance-view" class="content-view hidden">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">Attendance</h1>
+                        <p class="text-gray-500 text-lg mb-8">Track your class attendance</p>
+
+                        <!-- Attendance Summary Cards (Responsive: 1 column on mobile, 3 on tablet/desktop) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <div class="text-base font-semibold text-gray-500 mb-2">Overall Attendance</div>
+                                <div class="text-4xl font-extrabold text-[#3264e0] mb-3">85%</div>
+                                <div class="h-2.5 bg-gray-200 rounded-full">
+                                    <div class="h-2.5 bg-[#3264e0] rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <div class="text-base font-semibold text-gray-500 mb-2">Classes Attended</div>
+                                <div class="text-4xl font-extrabold text-green-600 mb-1">68</div>
+                                <div class="text-sm text-gray-500">out of 80</div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <div class="text-base font-semibold text-gray-500 mb-2">Classes Missed</div>
+                                <div class="text-4xl font-extrabold text-red-600 mb-1">8</div>
+                                <div class="text-sm text-gray-500">out of 80</div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Attendance List -->
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Recent Attendance</h2>
+                            <ul class="space-y-4">
+                                <!-- List Item -->
+                                <li class="flex items-center justify-between border-b border-gray-100 pb-3 last:border-b-0 last:pb-0">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar-day w-5 h-5 text-gray-400 mr-3"></i>
+                                        <div>
+                                            <div class="font-medium text-gray-800">Mathematics</div>
+                                            <div class="text-sm text-gray-500">2024-01-15</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-green-600 font-medium flex items-center">
+                                        <i class="fas fa-check-circle mr-1 text-sm"></i> Present
+                                    </span>
+                                </li>
+                                <li class="flex items-center justify-between border-b border-gray-100 pb-3 last:border-b-0 last:pb-0">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar-day w-5 h-5 text-gray-400 mr-3"></i>
+                                        <div>
+                                            <div class="font-medium text-gray-800">Physics</div>
+                                            <div class="text-sm text-gray-500">2024-01-14</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-green-600 font-medium flex items-center">
+                                        <i class="fas fa-check-circle mr-1 text-sm"></i> Present
+                                    </span>
+                                </li>
+                                <li class="flex items-center justify-between border-b border-gray-100 pb-3 last:border-b-0 last:pb-0">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar-day w-5 h-5 text-gray-400 mr-3"></i>
+                                        <div>
+                                            <div class="font-medium text-gray-800">Chemistry</div>
+                                            <div class="text-sm text-gray-500">2024-01-13</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-red-600 font-medium flex items-center">
+                                        <i class="fas fa-times-circle mr-1 text-sm"></i> Absent
+                                    </span>
+                                </li>
+                                <li class="flex items-center justify-between border-b border-gray-100 pb-3 last:border-b-0 last:pb-0">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar-day w-5 h-5 text-gray-400 mr-3"></i>
+                                        <div>
+                                            <div class="font-medium text-gray-800">Biology</div>
+                                            <div class="text-sm text-gray-500">2024-01-12</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-green-600 font-medium flex items-center">
+                                        <i class="fas fa-check-circle mr-1 text-sm"></i> Present
+                                    </span>
+                                </li>
+                                <li class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-calendar-day w-5 h-5 text-gray-400 mr-3"></i>
+                                        <div>
+                                            <div class="font-medium text-gray-800">Mathematics</div>
+                                            <div class="text-sm text-gray-500">2024-01-11</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-green-600 font-medium flex items-center">
+                                        <i class="fas fa-check-circle mr-1 text-sm"></i> Present
+                                    </span>
+                                </li>
+                            </ul>
+                            <div class="mt-8 p-4 bg-gray-50 rounded-lg border border-dashed border-gray-200 h-96 flex items-center justify-center text-gray-500">
+                                Extra space for scroll test.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results View (Set as initial view via JS) -->
+                    <div id="results-view" class="content-view">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">Academic Results</h1>
+                        <p class="text-gray-500 text-lg mb-8">View your grades and performance</p>
+
+                        <!-- Overall GPA Card -->
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mb-8">
+                            <div class="flex items-center text-xl font-semibold text-gray-800 mb-2">
+                                <i class="fas fa-medal text-[#3264e0] mr-2"></i> Overall GPA
+                            </div>
+                            <div class="text-6xl font-extrabold text-gray-900 mb-1">3.8</div>
+                            <p class="text-green-600 font-medium">Keep up the excellent work!</p>
+                        </div>
+
+                        <!-- Subject Grade Cards (Responsive: 1 column on mobile, 2 on tablet/desktop) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Mathematics -->
+                            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <div class="text-xl font-semibold text-gray-800 mb-3">Mathematics</div>
+                                <div class="flex justify-between items-end">
+                                    <div>
+                                        <div class="text-5xl font-extrabold text-green-600">A+</div>
+                                        <div class="text-sm text-gray-500">95%</div>
+                                    </div>
+                                    <span class="text-green-500 font-medium text-sm flex items-center">
+                                        <i class="fas fa-arrow-up text-xs mr-1"></i> Improving
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- Physics -->
+                            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <div class="text-xl font-semibold text-gray-800 mb-3">Physics</div>
+                                <div class="flex justify-between items-end">
+                                    <div>
+                                        <div class="text-5xl font-extrabold text-[#3264e0]">A</div>
+                                        <div class="text-sm text-gray-500">88%</div>
+                                    </div>
+                                    <span class="text-green-500 font-medium text-sm flex items-center">
+                                        <i class="fas fa-arrow-up text-xs mr-1"></i> Improving
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- Chemistry -->
+                            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <div class="text-xl font-semibold text-gray-800 mb-3">Chemistry</div>
+                                <div class="flex justify-between items-end">
+                                    <div>
+                                        <div class="text-5xl font-extrabold text-yellow-600">B+</div>
+                                        <div class="text-sm text-gray-500">82%</div>
+                                    </div>
+                                    <span class="text-red-500 font-medium text-sm flex items-center">
+                                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i> Needs attention
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- Biology -->
+                            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                                <div class="text-xl font-semibold text-gray-800 mb-3">Biology</div>
+                                <div class="flex justify-between items-end">
+                                    <div>
+                                        <div class="text-5xl font-extrabold text-green-600">A</div>
+                                        <div class="text-sm text-gray-500">90%</div>
+                                    </div>
+                                    <span class="text-green-500 font-medium text-sm flex items-center">
+                                        <i class="fas fa-arrow-up text-xs mr-1"></i> Improving
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Added extra content to ensure scroll test works for the Results view -->
+                        <div class="mt-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4">Detailed Performance Report</h2>
+                            <p class="text-gray-600 mb-4">This section contains a lot of additional data tables and charts to demonstrate the fixed header functionality during scrolling. Scroll down to see the header and sidebar remain locked in place.</p>
+                            <div class="space-y-4">
+                                <div class="h-48 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">Chart Placeholder 1</div>
+                                <div class="h-48 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">Table Placeholder 2</div>
+                                <div class="h-48 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">Graph Placeholder 3</div>
+                                <div class="h-48 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">Data Set Placeholder 4 (Scroll Down More)</div>
+                                <div class="h-48 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">End of Content</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- AI Chat Bot View -->
+                    <div id="chat-bot-view" class="content-view hidden">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">AI Study Assistant</h1>
+                        <p class="text-gray-500 text-lg mb-8">Get instant help with your studies</p>
+                        
+                        <!-- Fixed chat height for better mobile viewing -->
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 h-[60vh] md:h-[600px] flex flex-col">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-robot text-[#3264e0] mr-2"></i> Chat with AI Assistant
+                            </h2>
+                            
+                            <!-- Chat History Container -->
+                            <div class="chat-container flex-1 overflow-y-auto space-y-4 pr-2">
+                                <!-- AI Message -->
+                                <div class="flex justify-start">
+                                    <!-- Responsive: max-w-full on mobile, smaller on desktop -->
+                                    <div class="max-w-full sm:max-w-md p-3 rounded-xl bg-gray-100 text-gray-800 shadow-sm text-sm">
+                                        <i class="fas fa-robot text-base text-[#3264e0] mr-1"></i> Hello! I'm your AI study assistant. How can I help you today?
+                                    </div>
+                                </div>
+                                <!-- User Message (Example) -->
+                                <div class="flex justify-end">
+                                    <div class="max-w-full sm:max-w-md p-3 rounded-xl bg-[#3264e0] text-white shadow-md text-sm">
+                                        Can you explain the difference between speed and velocity?
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Input Area -->
+                            <div class="mt-4 flex">
+                                <input type="text" placeholder="Ask me anything about your studies..." class="flex-1 rounded-l-lg border border-gray-300 p-3 shadow-sm focus:border-[#3264e0] focus:ring focus:ring-[#3264e0]/20 transition-all">
+                                <button class="bg-[#3264e0] text-white p-3 rounded-r-lg hover:bg-[#254b9d] transition-colors shadow-md">
+                                    <i class="fas fa-paper-plane w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculator View -->
+                    <div id="calculator-view" class="content-view hidden">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">Scientific Calculator</h1>
+                        <p class="text-gray-500 text-lg mb-8">Perform complex calculations</p>
+
+                        <!-- Centered Calculator Card -->
+                        <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mx-auto max-w-lg">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-calculator text-[#3264e0] mr-2"></i> Calculator
+                            </h2>
+
+                            <div class="w-full">
+                                <!-- Display -->
+                                <div id="calc-display" class="bg-gray-100 p-4 mb-4 text-right text-3xl font-light rounded-lg shadow-inner border border-gray-200 h-16 overflow-x-auto whitespace-nowrap">0</div>
+
+                                <!-- Main Grid -->
+                                <div class="grid grid-cols-4 gap-3">
+                                    <!-- Numeric/Basic Operators -->
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value="7">7</button>
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value="8">8</button>
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value="9">9</button>
+                                    <button class="calc-btn-op bg-[#3264e0] text-white hover:bg-[#254b9d] text-xl font-medium p-4 rounded-lg transition-colors shadow-md" data-value="/">÷</button>
+
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value="4">4</button>
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value="5">5</button>
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value="6">6</button>
+                                    <button class="calc-btn-op bg-[#3264e0] text-white hover:bg-[#254b9d] text-xl font-medium p-4 rounded-lg transition-colors shadow-md" data-value="*">x</button>
+
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value="1">1</button>
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value="2">2</button>
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value="3">3</button>
+                                    <button class="calc-btn-op bg-[#3264e0] text-white hover:bg-[#254b9d] text-xl font-medium p-4 rounded-lg transition-colors shadow-md" data-value="-">-</button>
+
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm col-span-1" data-value="0">0</button>
+                                    <button class="calc-btn-num bg-gray-50 text-gray-900 hover:bg-gray-200 text-xl font-medium p-4 rounded-lg transition-colors shadow-sm" data-value=".">.</button>
+                                    <button id="calc-equals" class="calc-btn-op bg-[#3264e0] text-white hover:bg-[#254b9d] text-xl font-medium p-4 rounded-lg transition-colors shadow-md" data-value="=">=</button>
+                                    <button class="calc-btn-op bg-[#3264e0] text-white hover:bg-[#254b9d] text-xl font-medium p-4 rounded-lg transition-colors shadow-md" data-value="+">+</button>
+                                </div>
+
+                                <!-- Scientific Functions (2 columns on mobile, 3 on tablet/desktop) -->
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+                                    <button class="calc-btn-sci bg-blue-500 text-white hover:bg-blue-600 text-base font-medium p-3 rounded-lg transition-colors shadow-md" data-func="Math.sin(DEG_TO_RAD*)">sin</button>
+                                    <button class="calc-btn-sci bg-blue-500 text-white hover:bg-blue-600 text-base font-medium p-3 rounded-lg transition-colors shadow-md" data-func="Math.cos(DEG_TO_RAD*)">cos</button>
+                                    <button class="calc-btn-sci bg-blue-500 text-white hover:bg-blue-600 text-base font-medium p-3 rounded-lg transition-colors shadow-md" data-func="Math.tan(DEG_TO_RAD*)">tan</button>
+
+                                    <button class="calc-btn-sci bg-blue-500 text-white hover:bg-blue-600 text-base font-medium p-3 rounded-lg transition-colors shadow-md" data-func="Math.sqrt(*)">√</button>
+                                    <button class="calc-btn-sci bg-blue-500 text-white hover:bg-blue-600 text-base font-medium p-3 rounded-lg transition-colors shadow-md" data-func="Math.pow(*, 2)">x²</button>
+                                    <button class="calc-btn-num bg-blue-500 text-white hover:bg-blue-600 text-base font-medium p-3 rounded-lg transition-colors shadow-md" data-value="Math.PI">π</button>
+                                </div>
+                                
+                                <!-- Clear Button -->
+                                <div class="mt-4">
+                                    <button id="calc-clear" class="w-full bg-red-500 text-white hover:bg-red-600 text-base font-medium p-3 rounded-lg transition-colors shadow-md">
+                                        Clear (C)
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder views for other sections (Teachers, Courses, Whiteboard, Assignment, Formula Charts) -->
+                    <div id="teachers-view" class="content-view hidden">
+                        <!-- Educators Hero Section -->
+                        <section style="background:linear-gradient(180deg,#f7faff 60%,#fff 100%);padding:10px 0 0 0;text-align:center;">
+                            <div class="container" style="max-width:1100px;margin:0 auto;">
+                                <h1 style="font-size:2.8rem;font-weight:800;color:#3264e0;margin-bottom:16px;letter-spacing:-1px;">Meet Our Expert Educators</h1>
+                                <p style="font-size:1.18rem;color:#3b4861;margin-bottom:38px;">Learn from certified, experienced professionals dedicated to your academic success</p>
+                                <div style="display:flex;justify-content:center;gap:64px;margin-bottom:54px;flex-wrap:wrap;">
+                                    <div style="text-align:center;">
+                                        <div style="font-size:2.1rem;font-weight:800;color:#3264e0;">2,500+</div>
+                                        <div style="font-size:1rem;color:#6b7280;margin-top:2px;">Students Taught</div>
+                                    </div>
+                                    <div style="text-align:center;">
+                                        <div style="font-size:2.1rem;font-weight:800;color:#3264e0;">25+</div>
+                                        <div style="font-size:1rem;color:#6b7280;margin-top:2px;">Years Combined Experience</div>
+                                    </div>
+                                    <div style="text-align:center;">
+                                        <div style="font-size:2.1rem;font-weight:800;color:#3264e0;">95%</div>
+                                        <div style="font-size:1rem;color:#6b7280;margin-top:2px;">Success Rate</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Educator Cards Section -->
+                        <section style="background:#fff;padding:0 0 60px 0;">
+                            <div class="container" style="max-width:1200px;margin:0 auto;display:flex;gap:32px;justify-content:center;flex-wrap:wrap;">
+                                <!-- Card 1 -->
+                                <div style="background:#f7faff;border-radius:18px;box-shadow:0 2px 16px 0 rgba(30,42,90,0.07);display:flex;flex-direction:row;align-items:center;max-width:520px;min-width:340px;width:100%;padding:32px 32px 32px 24px;gap:28px;border:1.5px solid #e3e8f0;">
+                                    <div style="flex-shrink:0;">
+                                        <img src="{{ url_for('static', filename='images/subham.jpg') }}" alt="Dr.Subham Sahu" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid #fff;box-shadow:0 2px 8px rgba(30,42,90,0.10);background:#e7edfd;" loading="lazy">
+                                    </div>
+                                    <div style="text-align:left;flex:1;">
+                                        <div style="font-size:1.35rem;font-weight:800;color:#1a2340;margin-bottom:2px;">Dr. Subham Sahu</div>
+                                        <div style="color:#4b5a7a;font-size:1.05rem;margin-bottom:8px;">Mathematics & Physics</div>
+                                        <div style="color:#3b4861;font-size:1.01rem;margin-bottom:14px;">Expert in making complex mathematical concepts simple and engaging for students.</div>
+                                        <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap;">
+                                            <span style="color:#3264e0;font-size:1.05rem;"><i class="fas fa-briefcase"></i> 15+ Years</span>
+                                            <span style="color:#3264e0;font-size:1.05rem;"><i class="fas fa-graduation-cap"></i> Ph.D. in Mathematics</span>
+                                            <span style="color:#3264e0;font-size:1.05rem;">M.Sc. Physics</span>
+                                        </div>
+                                        <div style="color:#3264e0;font-size:1.05rem;margin-bottom:10px;"><i class="fas fa-users"></i> 500+ Students Taught</div>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                            <span style="background:#3264e0;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">IIT-JEE</span>
+                                            <span style="background:#22c55e;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">NEET</span>
+                                            <span style="background:#2563eb;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">Board Exams</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Card 2 -->
+                                <div style="background:#f7faff;border-radius:18px;box-shadow:0 2px 16px 0 rgba(30,42,90,0.07);display:flex;flex-direction:row;align-items:center;max-width:520px;min-width:340px;width:100%;padding:32px 32px 32px 24px;gap:28px;border:1.5px solid #e3e8f0;">
+                                    <div style="flex-shrink:0;">
+                                        <img src="{{ url_for('static', filename='images/teacher2.jpg') }}" alt="Prof. Rajesh Kumar" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid #fff;box-shadow:0 2px 8px rgba(30,42,90,0.10);background:#e7edfd;" loading="lazy">
+                                    </div>
+                                    <div style="text-align:left;flex:1;">
+                                        <div style="font-size:1.35rem;font-weight:800;color:#1a2340;margin-bottom:2px;">Prof. Rajesh Kumar</div>
+                                        <div style="color:#4b5a7a;font-size:1.05rem;margin-bottom:8px;">Chemistry & Biology</div>
+                                        <div style="color:#3b4861;font-size:1.01rem;margin-bottom:14px;">Passionate educator with a proven track record in competitive exam preparation.</div>
+                                        <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap;">
+                                            <span style="color:#3264e0;font-size:1.05rem;"><i class="fas fa-briefcase"></i> 18+ Years</span>
+                                            <span style="color:#3264e0;font-size:1.05rem;"><i class="fas fa-graduation-cap"></i> M.Sc. Chemistry</span>
+                                            <span style="color:#3264e0;font-size:1.05rem;">B.Ed.</span>
+                                        </div>
+                                        <div style="color:#3264e0;font-size:1.05rem;margin-bottom:10px;"><i class="fas fa-users"></i> 600+ Students Taught</div>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                            <span style="background:#22c55e;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">NEET</span>
+                                            <span style="background:#2563eb;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">Board Exams</span>
+                                            <span style="background:#f59e42;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">Olympiads</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Card 3 -->
+                                <div style="background:#f7faff;border-radius:18px;box-shadow:0 2px 16px 0 rgba(30,42,90,0.07);display:flex;flex-direction:row;align-items:center;max-width:520px;min-width:340px;width:100%;padding:32px 32px 32px 24px;gap:28px;border:1.5px solid #e3e8f0;">
+                                    <div style="flex-shrink:0;">
+                                        <img src="{{ url_for('static', filename='images/founder.png') }}" alt="Rashmi Ranjan Sahu" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid #fff;box-shadow:0 2px 8px rgba(30,42,90,0.10);background:#e7edfd;" loading="lazy">
+                                    </div>
+                                    <div style="text-align:left;flex:1;">
+                                        <div style="font-size:1.35rem;font-weight:800;color:#1a2340;margin-bottom:2px;">Rashmi Ranjan Sahu</div>
+                                        <div style="color:#4b5a7a;font-size:1.05rem;margin-bottom:8px;">Chemistry & Biology</div>
+                                        <div style="color:#3b4861;font-size:1.01rem;margin-bottom:14px;">Passionate educator with a proven track record in competitive exam preparation.</div>
+                                        <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap;">
+                                            <span style="color:#3264e0;font-size:1.05rem;"><i class="fas fa-briefcase"></i> 18+ Years</span>
+                                            <span style="color:#3264e0;font-size:1.05rem;"><i class="fas fa-graduation-cap"></i> M.Sc. Chemistry</span>
+                                            <span style="color:#3264e0;font-size:1.05rem;">B.Ed.</span>
+                                        </div>
+                                        <div style="color:#3264e0;font-size:1.05rem;margin-bottom:10px;"><i class="fas fa-users"></i> 600+ Students Taught</div>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                            <span style="background:#22c55e;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">NEET</span>
+                                            <span style="background:#2563eb;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">Board Exams</span>
+                                            <span style="background:#f59e42;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">Olympiads</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Card 4 -->
+                                <div style="background:#f7faff;border-radius:18px;box-shadow:0 2px 16px 0 rgba(30,42,90,0.07);display:flex;flex-direction:row;align-items:center;max-width:520px;min-width:340px;width:100%;padding:32px 32px 32px 24px;gap:28px;border:1.5px solid #e3e8f0;">
+                                    <div style="flex-shrink:0;">
+                                        <img src="images/teacher2.jpg" alt="Prof. Rajesh Kumar" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:4px solid #fff;box-shadow:0 2px 8px rgba(30,42,90,0.10);background:#e7edfd;" loading="lazy">
+                                    </div>
+                                    <div style="text-align:left;flex:1;">
+                                        <div style="font-size:1.35rem;font-weight:800;color:#1a2340;margin-bottom:2px;">Prof. Rajesh Kumar</div>
+                                        <div style="color:#4b5a7a;font-size:1.05rem;margin-bottom:8px;">Chemistry & Biology</div>
+                                        <div style="color:#3b4861;font-size:1.01rem;margin-bottom:14px;">Passionate educator with a proven track record in competitive exam preparation.</div>
+                                        <div style="display:flex;align-items:center;gap:16px;margin-bottom:8px;flex-wrap:wrap;">
+                                            <span style="color:#3264e0;font-size:1.05rem;"><i class="fas fa-briefcase"></i> 18+ Years</span>
+                                            <span style="color:#3264e0;font-size:1.05rem;"><i class="fas fa-graduation-cap"></i> M.Sc. Chemistry</span>
+                                            <span style="color:#3264e0;font-size:1.05rem;">B.Ed.</span>
+                                        </div>
+                                        <div style="color:#3264e0;font-size:1.05rem;margin-bottom:10px;"><i class="fas fa-users"></i> 600+ Students Taught</div>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                            <span style="background:#22c55e;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">NEET</span>
+                                            <span style="background:#2563eb;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">Board Exams</span>
+                                            <span style="background:#f59e42;color:#fff;font-size:0.98rem;font-weight:600;padding:4px 14px;border-radius:8px;">Olympiads</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div id="courses-view" class="content-view hidden">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">Courses</h1>
+                        <p class="text-gray-500 text-lg">Your enrolled courses and study materials.</p>
+                        <!-- Course Cards Section -->
+                        <div class="course-cards-row" style="display:flex;gap:32px;justify-content:flex-start;align-items:stretch;padding:8px 0 40px 0;max-width:1200px;margin:0 auto 0 auto;flex-wrap:wrap;">
+                            <!-- Card 1 -->
+                            <div style="background:#fff;border-radius:18px;box-shadow:0 4px 18px 0 rgba(30,42,90,0.08);width:350px;overflow:hidden;display:flex;flex-direction:column;">
+                                <div style="background:linear-gradient(135deg,#1754d4 60%,#3a8bfd 100%);height:160px;display:flex;align-items:center;justify-content:center;"></div>
+                                <div style="padding:28px 28px 22px 28px;flex:1;display:flex;flex-direction:column;">
+                                    <div style="margin-bottom:10px;display:flex;gap:10px;align-items:center;">
+                                        <span style="background:#e7edfd;color:#1754d4;font-weight:600;font-size:0.98rem;padding:4px 14px;border-radius:8px;">Mathematics</span>
+                                        <span style="background:#f3f4f7;color:#6b7280;font-weight:500;font-size:0.98rem;padding:4px 14px;border-radius:8px;">Grade 8th</span>
+                                    </div>
+                                    <div style="font-size:1.32rem;font-weight:800;color:#1a2340;margin-bottom:8px;">Advanced Calculus & Algebra</div>
+                                    <div style="color:#4a5a6a;font-size:1.05rem;margin-bottom:18px;">Master calculus, algebra, and analytical geometry with comprehensive lessons and practice problems.</div>
+                                    <div style="display:flex;gap:18px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+                                        <span style="display:flex;align-items:center;gap:6px;font-size:1.01rem;color:#3a4a5d;"><span>📚</span>18 Lessons</span>
+                                        <span style="display:flex;align-items:center;gap:6px;font-size:1.01rem;color:#3a4a5d;"><span>⏱️</span>6 months</span>
+                                        <span style="display:flex;align-items:center;gap:6px;font-size:1.01rem;color:#3a4a5d;"><span>👥</span>20+ enrolled</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;">
+                                        <span style="font-size:1.45rem;font-weight:700;color:#1754d4;">₹2,500</span>
+                                        <button style="background:#1754d4;color:#fff;font-weight:600;font-size:1.08rem;padding:10px 28px;border-radius:10px;border:none;outline:none;box-shadow:none;transition:background 0.2s;cursor:pointer;">Enroll Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 2 -->
+                            <div style="background:#fff;border-radius:18px;box-shadow:0 4px 18px 0 rgba(30,42,90,0.08);width:350px;overflow:hidden;display:flex;flex-direction:column;">
+                                <div style="background:linear-gradient(135deg,#2e7be4 60%,#6ad1e3 100%);height:160px;display:flex;align-items:center;justify-content:center;"></div>
+                                <div style="padding:28px 28px 22px 28px;flex:1;display:flex;flex-direction:column;">
+                                    <div style="margin-bottom:10px;display:flex;gap:10px;align-items:center;">
+                                        <span style="background:#e7edfd;color:#2e7be4;font-weight:600;font-size:0.98rem;padding:4px 14px;border-radius:8px;">Chemistry</span>
+                                        <span style="background:#f3f4f7;color:#6b7280;font-weight:500;font-size:0.98rem;padding:4px 14px;border-radius:8px;">Grade 8th </span>
+                                    </div>
+                                    <div style="font-size:1.32rem;font-weight:800;color:#1a2340;margin-bottom:8px;">Organic & Inorganic Chemistry</div>
+                                    <div style="color:#4a5a6a;font-size:1.05rem;margin-bottom:18px;">Complete chemistry course covering organic reactions, periodic properties, and chemical bonding.</div>
+                                    <div style="display:flex;gap:18px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+                                        <span style="display:flex;align-items:center;gap:6px;font-size:1.01rem;color:#3a4a5d;"><span>📚</span>12 Lessons</span>
+                                        <span style="display:flex;align-items:center;gap:6px;font-size:1.01rem;color:#3a4a5d;"><span>⏱️</span>7 months</span>
+                                        <span style="display:flex;align-items:center;gap:6px;font-size:1.01rem;color:#3a4a5d;"><span>👥</span>10+ enrolled</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;">
+                                        <span style="font-size:1.45rem;font-weight:700;color:#2e7be4;">₹2,500</span>
+                                        <button style="background:#2e7be4;color:#fff;font-weight:600;font-size:1.08rem;padding:10px 28px;border-radius:10px;border:none;outline:none;box-shadow:none;transition:background 0.2s;cursor:pointer;">Enroll Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 3 -->
+                            <div style="background:#fff;border-radius:18px;box-shadow:0 4px 18px 0 rgba(30,42,90,0.08);width:350px;overflow:hidden;display:flex;flex-direction:column;">
+                                <div style="background:linear-gradient(135deg,#1e3a8a 60%,#fbbf24 100%);height:160px;display:flex;align-items:center;justify-content:center;"></div>
+                                <div style="padding:28px 28px 22px 28px;flex:1;display:flex;flex-direction:column;">
+                                    <div style="margin-bottom:10px;display:flex;gap:10px;align-items:center;">
+                                        <span style="background:#e7edfd;color:#1e3a8a;font-weight:600;font-size:0.98rem;padding:4px 14px;border-radius:8px;">Physics</span>
+                                        <span style="background:#f3f4f7;color:#6b7280;font-weight:500;font-size:0.98rem;padding:4px 14px;border-radius:8px;">Grade 8th</span>
+                                    </div>
+                                    <div style="font-size:1.32rem;font-weight:800;color:#1a2340;margin-bottom:8px;">Mechanics & Electromagnetism</div>
+                                    <div style="color:#4a5a6a;font-size:1.05rem;margin-bottom:18px;">Deep dive into classical mechanics, waves, optics, and electromagnetic theory with practical applications.</div>
+                                    <div style="display:flex;gap:18px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+                                        <span style="display:flex;align-items:center;gap:6px;font-size:1.01rem;color:#3a4a5d;"><span>📚</span>15 Lessons</span>
+                                        <span style="display:flex;align-items:center;gap:6px;font-size:1.01rem;color:#3a4a5d;"><span>⏱️</span>6 months</span>
+                                        <span style="display:flex;align-items:center;gap:6px;font-size:1.01rem;color:#3a4a5d;"><span>👥</span>20+ enrolled</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto;">
+                                        <span style="font-size:1.45rem;font-weight:700;color:#1e3a8a;">₹2,500</span>
+                                        <button style="background:#1e3a8a;color:#fff;font-weight:600;font-size:1.08rem;padding:10px 28px;border-radius:10px;border:none;outline:none;box-shadow:none;transition:background 0.2s;cursor:pointer;">Enroll Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="whiteboard-view" class="content-view hidden">
+<style>
+    :root{
+      --bg: #f3f6f9;
+      --frame: #2b2f33;
+      --board: #ffffff;
+      --accent: #0ea5a4;
+      --muted: #6b7280;
+      --shadow: rgba(16,24,40,0.12);
+    }
+    *{box-sizing:border-box}
+        body{
+            margin:0; font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,-apple-system,"Helvetica Neue",Arial; background:linear-gradient(180deg,var(--bg),#eef2f7);
+            min-height:100vh; padding:0;
+        }
+
+    /* Container */
+    .wrap{width:100%;max-width:700px;display:block;}
+
+    /* Toolbar */
+    .toolbar{
+      background:white; border-radius:14px; padding:16px; box-shadow:0 6px 18px var(--shadow); border:1px solid rgba(16,24,40,0.04);
+      display:flex; flex-direction:column; gap:12px; height:640px;
+    }
+    .toolbar h2{margin:0;font-size:16px;color:var(--frame)}
+
+    .group{background:#fbfdfe;padding:10px;border-radius:10px;border:1px solid rgba(16,24,40,0.03)}
+    .row{display:flex;gap:8px;align-items:center}
+
+    label{font-size:13px;color:var(--muted)}
+    .color-swatch{width:34px;height:34px;border-radius:8px;border:2px solid transparent;cursor:pointer;box-shadow:0 4px 10px rgba(2,6,23,0.06)}
+    .color-swatch.selected{outline:3px solid rgba(14,165,164,0.12);transform:scale(1.02)}
+
+    input[type=range]{width:100%}
+    button, .tool-btn{appearance:none;border:0;background:var(--accent);color:white;padding:8px 12px;border-radius:10px;cursor:pointer}
+    .tool-btn{display:inline-flex; gap:8px; align-items:center; justify-content:center}
+
+    .tools{display:flex;flex-direction:column;gap:8px}
+    .small{padding:6px 8px;border-radius:8px;font-size:13px}
+
+    /* Whiteboard frame */
+        .board-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        .frame {
+            background: linear-gradient(180deg,#151515,#2b2f33);
+            padding: 22px;
+            border-radius: 18px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            width: 100%;
+            height: 100%;
+            min-height: 600px;
+            min-width: 1100px;
+        }
+        .frame .inner {
+            width: 100%;
+            height: 100%;
+            min-width: 1100px;
+            min-height: 600px;
+            background: var(--board);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 6px 24px rgba(2,6,23,0.12) inset, 0 8px 28px rgba(2,6,23,0.08);
+            border: 6px solid #fafafa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            z-index: 1;
+        }
+
+    /* chalk-like subtle grid */
+    .inner::before{
+      content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(0,0,0,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.02) 1px, transparent 1px); background-size:40px 40px; opacity:0.55; pointer-events:none;
+    }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            min-width: 1100px;
+            min-height: 600px;
+            display: block;
+            touch-action: none;
+            pointer-events: auto;
+            background: transparent;
+            z-index: 1;
+        }
+
+    .controls-bottom{display:flex; gap:8px; align-items:center; justify-content:flex-end; margin-top:6px}
+
+    .muted{color:var(--muted);font-size:13px}
+    .flex{display:flex;gap:8px}
+    .spacer{flex:1}
+
+    /* responsive */
+    @media (max-width:1000px){ .wrap{grid-template-columns:1fr} .toolbar{height:auto} .frame .inner{max-width:100%;height:520px} }
+
+    /* tiny helper styles */
+    .icon{width:18px;height:18px;display:inline-block}
+    .hint{font-size:12px;color:var(--muted)}
+</style>
+<div class="wb-body">
+    <div class="whiteboard-container">
+        <div class="toolbar-horizontal">
+            <div class="group">
+                <label>Tools</label>
+                <button id="penBtn" class="small tool-btn" title="Pen">✏️ Pen</button>
+                <button id="eraserBtn" class="small" title="Eraser">🧽 Eraser</button>
+                <button id="textBtn" class="small" title="Text">🅰️ Text</button>
+                <button id="clearBtn" class="small" title="Clear board">🗑️ Clear</button>
+                <button id="undoBtn" class="small" title="Undo">↶ Undo</button>
+                <button id="redoBtn" class="small" title="Redo">↷ Redo</button>
+                <button id="downloadBtn" class="small" title="Download PNG">⬇️ Download</button>
+            </div>
+            <div class="group">
+                <label>Colors</label>
+                <span id="colorRow" style="display:inline-flex;gap:6px;vertical-align:middle;"></span>
+            </div>
+            <div class="group">
+                <label>Pen</label>
+                <input id="penSize" type="range" min="1" max="60" value="4" />
+                <span id="penSizeLabel" class="muted">4</span>
+            </div>
+            <div class="group">
+                <label>Eraser</label>
+                <input id="eraserSize" type="range" min="6" max="120" value="18" />
+                <span id="eraserSizeLabel" class="muted">18</span>
+                <label class="hint" style="margin-left:8px;">Shape:</label>
+                <select id="eraserShape" style="padding:6px;border-radius:8px">
+                    <option value="circle">Circle</option>
+                    <option value="square">Square</option>
+                </select>
+            </div>
+            <div class="group">
+                <label>Text</label>
+                <input id="textInput" placeholder="Type text then click on board" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);width:120px;" />
+                <label class="hint" style="margin-left:8px;">Font</label>
+                <input id="textSize" type="range" min="10" max="72" value="20" style="width:70px;" />
+                <span id="textSizeLabel" class="muted">20</span>
+            </div>
+            <div class="group">
+                <label>Opacity</label>
+                <input id="opacity" type="range" min="0.1" max="1" step="0.05" value="1" style="width:70px;" />
+                <span id="opacityLabel" class="muted">1</span>
+            </div>
+            <div class="group">
+                <button id="saveStates" class="small">Save snapshot</button>
+                <button id="restoreState" class="small">Restore last</button>
+            </div>
+            <div class="muted" style="margin-left:12px;">Tip: Use two-finger drag or mouse to draw. Press <strong>Esc</strong> to cancel text placement.</div>
+        </div>
+        <div class="board-wrap">
+            <div class="frame">
+                <div class="inner">
+                    <canvas id="board"></canvas>
+                </div>
+                <div class="controls-bottom">
+                    <div class="muted">Frame: <strong style="color:var(--frame)">Modern Slate</strong></div>
+                    <div class="spacer"></div>
+                    <div class="muted">Mode: <span id="modeLabel">Pen</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+                                                <script>
+                                                (function(){
+                                                    const canvas = document.getElementById('board');
+                                                    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                                                    let w = canvas.clientWidth, h = canvas.clientHeight;
+                                                    function resize(){
+                                                        const data = ctx.getImageData(0,0,canvas.width||1,canvas.height||1);
+                                                        canvas.width = canvas.clientWidth * devicePixelRatio;
+                                                        canvas.height = canvas.clientHeight * devicePixelRatio;
+                                                        canvas.style.width = canvas.clientWidth + 'px';
+                                                        canvas.style.height = canvas.clientHeight + 'px';
+                                                        ctx.scale(devicePixelRatio, devicePixelRatio);
+                                                        if (data) { try{ ctx.putImageData(data,0,0); }catch(e){} }
+                                                    }
+                                                    setTimeout(resize,10);
+                                                    window.addEventListener('resize', () => { resize(); });
+                                                    let drawing=false, last=null;
+                                                    let tool='pen';
+                                                    let brushColor='#111827';
+                                                    let penSize=4, eraserSize=18, eraserShape='circle';
+                                                    let opacity = 1;
+                                                    const undoStack = []; const redoStack = [];
+                                                    function pushState(){ try{ undoStack.push(canvas.toDataURL()); if (undoStack.length>50) undoStack.shift(); redoStack.length=0; }catch(e){} }
+                                                    function restoreFromDataURL(dataURL){ const img = new Image(); img.onload = ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0,canvas.clientWidth,canvas.clientHeight); }; img.src = dataURL; }
+                                                    pushState();
+                                                    function setModeLabel(){ document.getElementById('modeLabel').textContent = tool.charAt(0).toUpperCase() + tool.slice(1); }
+                                                    setModeLabel();
+                                                    function getPointer(evt){ const rect = canvas.getBoundingClientRect(); const clientX = (evt.touches ? evt.touches[0].clientX : evt.clientX); const clientY = (evt.touches ? evt.touches[0].clientY : evt.clientY); return { x: clientX - rect.left, y: clientY - rect.top }; }
+                                                    function beginDraw(p){ drawing=true; last = p; ctx.lineCap = 'round'; ctx.lineJoin='round'; }
+                                                    function drawTo(p){ if(!drawing) return; if(tool==='pen'){
+                                                            ctx.globalCompositeOperation = 'source-over';
+                                                            ctx.globalAlpha = opacity;
+                                                            ctx.strokeStyle = brushColor; ctx.lineWidth = penSize; ctx.beginPath(); ctx.moveTo(last.x, last.y); ctx.lineTo(p.x, p.y); ctx.stroke();
+                                                        } else if (tool==='eraser'){
+                                                            ctx.globalCompositeOperation = 'destination-out'; ctx.globalAlpha = 1;
+                                                            if (eraserShape==='circle'){
+                                                                ctx.beginPath(); ctx.arc(p.x,p.y, eraserSize/2, 0, Math.PI*2); ctx.fill();
+                                                            } else {
+                                                                ctx.clearRect(p.x - eraserSize/2, p.y - eraserSize/2, eraserSize, eraserSize);
+                                                            }
+                                                        }
+                                                        last = p;
+                                                    }
+                                                    function endDraw(){ if(drawing){ drawing=false; last=null; pushState(); } }
+                                                    canvas.addEventListener('pointerdown', (e)=>{ canvas.setPointerCapture(e.pointerId); const p=getPointer(e); if(tool==='text'){ placeTextAt(p); return; } beginDraw(p); });
+                                                    canvas.addEventListener('pointermove', (e)=>{ if(!drawing) return; drawTo(getPointer(e)); });
+                                                    canvas.addEventListener('pointerup', (e)=>{ canvas.releasePointerCapture(e.pointerId); endDraw(); });
+                                                    canvas.addEventListener('pointercancel', endDraw);
+                                                    document.getElementById('penBtn').addEventListener('click', ()=>{ tool='pen'; setModeLabel(); document.getElementById('penBtn').classList.add('selected'); });
+                                                    document.getElementById('eraserBtn').addEventListener('click', ()=>{ tool='eraser'; setModeLabel(); });
+                                                    document.getElementById('textBtn').addEventListener('click', ()=>{ tool='text'; setModeLabel(); });
+                                                    document.getElementById('clearBtn').addEventListener('click', ()=>{ if(confirm('Clear the board?')){ ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight); pushState(); }});
+                                                    document.getElementById('undoBtn').addEventListener('click', ()=>{
+                                                        if(undoStack.length>1){ const cur = undoStack.pop(); redoStack.push(cur); const last = undoStack[undoStack.length-1]; restoreFromDataURL(last); }
+                                                    });
+                                                    document.getElementById('redoBtn').addEventListener('click', ()=>{ if(redoStack.length){ const r = redoStack.pop(); restoreFromDataURL(r); undoStack.push(r); }});
+                                                    document.getElementById('downloadBtn').addEventListener('click', ()=>{
+                                                        const link = document.createElement('a'); link.download='whiteboard.png'; link.href = canvas.toDataURL('image/png'); link.click();
+                                                    });
+                                                    const colors = ['#111827','#0f766e','#ef4444','#f59e0b','#10b981','#2563eb','#8b5cf6','#ec4899','#000000','#ffffff'];
+                                                    const colorRow = document.getElementById('colorRow');
+                                                    colors.forEach((c,i)=>{
+                                                        const el = document.createElement('div'); el.className='color-swatch'; el.style.background=c; el.title=c; el.addEventListener('click', ()=>{ brushColor=c; tool='pen'; setModeLabel(); document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected')); el.classList.add('selected'); });
+                                                        if(i===0) el.classList.add('selected'); colorRow.appendChild(el);
+                                                    });
+                                                    const penSizeInput = document.getElementById('penSize');
+                                                    const penSizeLabel = document.getElementById('penSizeLabel');
+                                                    penSizeInput.addEventListener('input', e=>{ penSize = Number(e.target.value); penSizeLabel.textContent = penSize; });
+                                                    const eraserSizeInput = document.getElementById('eraserSize');
+                                                    const eraserSizeLabel = document.getElementById('eraserSizeLabel');
+                                                    eraserSizeInput.addEventListener('input', e=>{ eraserSize = Number(e.target.value); eraserSizeLabel.textContent = eraserSize; });
+                                                    document.getElementById('eraserShape').addEventListener('change', e=>{ eraserShape = e.target.value; });
+                                                    document.getElementById('opacity').addEventListener('input', e=>{ opacity = Number(e.target.value); document.getElementById('opacityLabel').textContent = opacity; });
+                                                    const textInput = document.getElementById('textInput');
+                                                    const textSizeInput = document.getElementById('textSize');
+                                                    const textSizeLabel = document.getElementById('textSizeLabel');
+                                                    textSizeInput.addEventListener('input', ()=>{ textSizeLabel.textContent = textSizeInput.value; });
+                                                    let placingText=false;
+                                                    function placeTextAt(p){
+                                                        const txt = textInput.value.trim(); if(!txt) { alert('Enter text in the input first'); return; }
+                                                        const input = document.createElement('input'); input.value = txt; input.style.position='absolute'; input.style.left = (p.x) + 'px'; input.style.top = (p.y) + 'px'; input.style.zIndex=9999; input.style.font = textSizeInput.value + 'px sans-serif'; input.style.border='1px dashed rgba(0,0,0,0.15)'; input.style.padding='4px'; input.style.background='transparent';
+                                                        document.body.appendChild(input); input.focus();
+                                                        function commit(){
+                                                            const text = input.value; if(text){ ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = opacity; ctx.font = textSizeInput.value + 'px sans-serif'; ctx.fillStyle = brushColor; ctx.fillText(text, p.x, p.y + (Number(textSizeInput.value)*0.75)); pushState(); }
+                                                            document.body.removeChild(input);
+                                                        }
+                                                        input.addEventListener('blur', commit);
+                                                        input.addEventListener('keydown', (ev)=>{ if(ev.key==='Enter'){ commit(); } else if(ev.key==='Escape'){ document.body.removeChild(input); } });
+                                                    }
+                                                    let lastSnapshot = null;
+                                                    document.getElementById('saveStates').addEventListener('click', ()=>{ lastSnapshot = canvas.toDataURL(); alert('Snapshot saved'); });
+                                                    document.getElementById('restoreState').addEventListener('click', ()=>{ if(lastSnapshot){ restoreFromDataURL(lastSnapshot); pushState(); } else alert('No snapshot saved'); });
+                                                    window.addEventListener('keydown', (e)=>{
+                                                        if(e.key==='e') { tool='eraser'; setModeLabel(); }
+                                                        if(e.key==='p') { tool='pen'; setModeLabel(); }
+                                                        if(e.key==='t') { tool='text'; setModeLabel(); }
+                                                        if(e.key==='Escape'){ placingText=false; }
+                                                    });
+                                                    const ro = new ResizeObserver(()=>{ const data = canvas.toDataURL(); resize(); const img = new Image(); img.onload = ()=>{ ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight); ctx.drawImage(img,0,0,canvas.clientWidth,canvas.clientHeight); }; img.src = data; });
+                                                    ro.observe(canvas);
+                                                    function fullInit(){ resize(); ctx.lineWidth=penSize; ctx.strokeStyle=brushColor; ctx.lineCap='round'; ctx.lineJoin='round'; ctx.font = '20px sans-serif'; ctx.fillStyle = brushColor; ctx.save(); ctx.globalAlpha = 0.04; ctx.font = '48px sans-serif'; ctx.fillText('Whiteboard', 40, 80); ctx.restore(); }
+                                                    setTimeout(fullInit,50);
+                                                    window.__wb = { canvas, ctx };
+                                                })();
+                                                </script>
+                    </div>
+                    <div id="assignment-view" class="content-view hidden">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">Assignments</h1>
+                        <p class="text-gray-500 text-lg">Upcoming and submitted assignments.</p>
+                        <div class="mt-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100 h-96">
+                            <p class="text-gray-700">Content for the Assignments section goes here.</p>
+                        </div>
+                    </div>
+                    <div id="formula-charts-view" class="content-view hidden">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">Formula Charts</h1>
+                        <p class="text-gray-500 text-lg">Quick reference charts for key formulas.</p>
+                        <div class="mt-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100 h-96">
+                            <p class="text-gray-700">Content for the Formula Charts section goes here.</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+
+    <script>
+        function openProfileModal() {
+            document.getElementById('edit-profile-modal').classList.remove('hidden');
+        }
+        function closeProfileModal() {
+            document.getElementById('edit-profile-modal').classList.add('hidden');
+        }
+    const photoInput = document.getElementById('edit-photo');
+    if (photoInput) {
+      photoInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(evt) {
+            document.getElementById('photo-preview').src = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    </script>
+
+    <script>
+        const navItems = document.querySelectorAll('.nav-item');
+        const contentViews = document.querySelectorAll('.content-view');
+        const profileButton = document.querySelector('[data-view="profile"]');
+        const display = document.getElementById('calc-display');
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
+        const menuToggle = document.getElementById('menu-toggle');
+        const DEG_TO_RAD = Math.PI / 180;
+        let currentExpression = '0';
+        let waitingForNewInput = true; // Flag to clear display on next number entry
+
+        // --- Sidebar/Responsiveness Logic ---
+        function toggleSidebar() {
+            // Check if we are on a small screen (less than 640px)
+            const isMobile = window.innerWidth < 640;
+
+            if (isMobile) {
+                // Toggle sidebar visibility
+                sidebar.classList.toggle('-translate-x-full');
+                sidebar.classList.toggle('sidebar-open');
+
+                // Toggle backdrop visibility/opacity
+                backdrop.classList.toggle('hidden');
+                backdrop.classList.toggle('backdrop-visible');
+            }
+        }
+
+        // Event listener for the menu toggle button
+        menuToggle.addEventListener('click', toggleSidebar);
+
+        // --- Navigation Logic ---
+
+        function showView(viewId) {
+            // Hide all views
+            contentViews.forEach(view => view.classList.add('hidden'));
+
+            // Show the requested view
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+            }
+
+            // Update active state in sidebar
+            navItems.forEach(item => {
+                item.classList.remove('active', 'bg-[#ffeecc]', 'text-[#1a2340]', 'font-semibold');
+                item.classList.add('hover:bg-gray-100');
+            });
+
+            const activeItem = document.querySelector(`.nav-item[data-view="${viewId.replace('-view', '')}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active', 'bg-[#ffeecc]', 'text-[#1a2340]', 'font-semibold');
+                activeItem.classList.remove('hover:bg-gray-100');
+            }
+
+            // Handle "View Profile" button style
+            if (viewId === 'profile-view') {
+                profileButton.classList.add('bg-gray-100');
+            } else {
+                profileButton.classList.remove('bg-gray-100');
+            }
+
+            // Close the sidebar on mobile after navigating
+            if (window.innerWidth < 640 && sidebar.classList.contains('sidebar-open')) {
+                toggleSidebar();
+            }
+        }
+
+        // Add event listeners to all navigation items
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const viewName = item.getAttribute('data-view');
+                showView(`${viewName}-view`);
+            });
+        });
+        
+        // Add listener to the profile button
+        profileButton.addEventListener('click', () => {
+            showView('profile-view');
+        });
+
+        // Set initial view to dashboard (or any default, but not profile)
+        showView('teachers-view');
+
+
+        // --- Calculator Logic ---
+
+        function updateDisplay() {
+            // Ensure the display is always limited to a reasonable length
+            let displayedValue = currentExpression.replace(/\*/g, 'x').replace(/\//g, '÷').replace(/Math\./g, '');
+            // Simple truncation to prevent overflow
+            if (displayedValue.length > 18) {
+                displayedValue = displayedValue.substring(0, 15) + '...';
+            }
+            display.textContent = displayedValue || '0';
+        }
+
+        function appendValue(value) {
+            if (currentExpression === '0' || waitingForNewInput) {
+                // Special handling for decimal point when display is 0
+                if (value === '.') {
+                    currentExpression = '0.';
+                } else if (value === '0') {
+                    currentExpression = '0'; // Keep it 0
+                } else {
+                    currentExpression = value;
+                }
+                waitingForNewInput = false;
+            } else {
+                // Prevent multiple decimals in the same number
+                if (value === '.' && currentExpression.split(/[\+\-\*\/]/).pop().includes('.')) {
+                    return;
+                }
+                currentExpression += value;
+            }
+            updateDisplay();
+        }
+
+        function appendOperator(operator) {
+            // Replace last operator if one exists
+            const lastChar = currentExpression.slice(-1);
+            if (['+', '-', '*', '/'].includes(lastChar)) {
+                currentExpression = currentExpression.slice(0, -1) + operator;
+            } else {
+                currentExpression += operator;
+            }
+            waitingForNewInput = false;
+            updateDisplay();
+        }
+
+        function calculateResult() {
+            try {
+                // Sanitize and evaluate the expression
+                // Replace "x" and "÷" with "*" and "/" for evaluation
+                let sanitizedExpression = currentExpression
+                    .replace(/x/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/\^/g, '**')
+                    .replace(/Math\.sin\(([^)]*)\)/g, (match, p1) => `Math.sin(${p1.replace('DEG_TO_RAD', DEG_TO_RAD)})`)
+                    .replace(/Math\.cos\(([^)]*)\)/g, (match, p1) => `Math.cos(${p1.replace('DEG_TO_RAD', DEG_TO_RAD)})`)
+                    .replace(/Math\.tan\(([^)]*)\)/g, (match, p1) => `Math.tan(${p1.replace('DEG_TO_RAD', DEG_TO_RAD)})`);
+
+                // Ensure it's safe to evaluate
+                const safeExpression = sanitizedExpression.match(/^[0-9+\-*/().\sDegRadPI*Mthlgotrsqt^]+$/) ? sanitizedExpression : '';
+                
+                if (!safeExpression) {
+                    throw new Error("Invalid expression");
+                }
+
+                const result = eval(safeExpression);
+                
+                if (isNaN(result) || !isFinite(result)) {
+                    throw new Error("Invalid result");
+                }
+
+                // Format result to limit decimal places
+                currentExpression = (Math.round(result * 10000) / 10000).toString();
+                waitingForNewInput = true;
+                updateDisplay();
+
+            } catch (error) {
+                display.textContent = 'Error';
+                currentExpression = '0';
+                waitingForNewInput = true;
+                console.error("Calculator Error:", error.message);
+            }
+        }
+
+        function applyScientificFunction(func) {
+            // Apply function to the current display value (treating it as the last number entered/calculated)
+            let lastValue = currentExpression.match(/([\d\.]+)(?!.*[\d\.]+)/)?.[0] || '0';
+            let startIndex = currentExpression.lastIndexOf(lastValue);
+            
+            // If the expression is just a number or result, apply to the whole thing
+            if (waitingForNewInput || startIndex === -1) {
+                currentExpression = func.replace('*', lastValue);
+            } else {
+                // Replace the last number with the function applied to it
+                currentExpression = currentExpression.substring(0, startIndex) + func.replace('*', lastValue);
+            }
+
+            // Special handling for PI as a number
+            if (func === 'Math.PI') {
+                currentExpression = currentExpression.replace('Math.PI', Math.PI.toString());
+            } else if (func.includes('Math.')) {
+                // If it's a function call, calculate immediately and set as the new expression
+                try {
+                    const tempResult = eval(currentExpression.replace('DEG_TO_RAD', DEG_TO_RAD));
+                    currentExpression = (Math.round(tempResult * 10000) / 10000).toString();
+                    waitingForNewInput = true;
+                } catch (e) {
+                    console.error("Sci Calc Error:", e);
+                }
+            }
+
+            updateDisplay();
+        }
+
+        // Event listeners for calculator buttons
+        document.querySelectorAll('.calc-btn-num').forEach(button => {
+            button.addEventListener('click', () => appendValue(button.getAttribute('data-value')));
+        });
+
+        document.querySelectorAll('.calc-btn-op').forEach(button => {
+            if (button.id !== 'calc-equals') {
+                button.addEventListener('click', () => appendOperator(button.getAttribute('data-value')));
+            }
+        });
+
+        document.querySelectorAll('.calc-btn-sci').forEach(button => {
+            button.addEventListener('click', () => applyScientificFunction(button.getAttribute('data-func')));
+        });
+
+        document.getElementById('calc-equals' ).addEventListener('click', calculateResult);
+        document.getElementById('calc-clear').addEventListener('click', () => {
+            currentExpression = '0';
+            waitingForNewInput = true;
+            updateDisplay();
+        });
+        
+        // Initial calculator display update
+        updateDisplay();
+    </script>
+
+</body>
+</html>

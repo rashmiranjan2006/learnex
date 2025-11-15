@@ -1,3 +1,13 @@
+    <script>
+    // Show Flask flash messages as popups
+    document.addEventListener('DOMContentLoaded', function() {
+        var messages = {{ get_flashed_messages(with_categories=true) | tojson }};
+        if (messages.length > 0) {
+            var msg = messages.map(function(m) { return m[1]; }).join('\n');
+            alert(msg);
+        }
+    });
+    </script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -538,7 +548,7 @@
             <h1>Welcome Back</h1>
             <p class="subtitle">Log in to your Learnex account</p>
 
-            <form class="login-form" autocomplete="on">
+            <form class="login-form" method="post" autocomplete="on">
                 <div class="form-group">
                     <label for="emailAddress">Email Address</label>
                     <input type="email" id="emailAddress" name="email" placeholder="your.email@example.com" required autocomplete="email">
