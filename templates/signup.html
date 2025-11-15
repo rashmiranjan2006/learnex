@@ -1,13 +1,3 @@
-    <script>
-    // Show Flask flash messages as popups
-    document.addEventListener('DOMContentLoaded', function() {
-        var messages = {{ get_flashed_messages(with_categories=true) | tojson }};
-        if (messages.length > 0) {
-            var msg = messages.map(function(m) { return m[1]; }).join('\n');
-            alert(msg);
-        }
-    });
-    </script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -469,7 +459,6 @@
 
         @media (max-width: 600px) {
             .signup-container {
-<<<<<<< HEAD
                 margin: 10px;
                 padding: 16px 8px;
                 max-width: 98vw;
@@ -578,61 +567,43 @@
                     padding: 8px 14px;
                 }
             }
-=======
-                margin: 20px;
-                padding: 30px;
+            @media (max-width: 600px) {
+                .signup-container {
+                    margin: 20px;
+                    padding: 30px;
+                }
+                .signup-container h1 {
+                    font-size: 1.8rem;
+                }
+                .subtitle {
+                    font-size: 0.9rem;
+                    margin-bottom: 30px;
+                }
+                .role-option i {
+                    font-size: 1.8rem;
+                }
+                .role-option span {
+                    font-size: 0.8rem;
+                }
+                .form-group label {
+                    font-size: 0.85rem;
+                }
+                .form-group input {
+                    padding: 10px 12px;
+                    font-size: 0.9rem;
+                }
+                .signup-button#signupBtn {
+                    padding: 12px 20px;
+                    font-size: 1rem;
+                }
             }
-
-            .signup-container h1 {
-                font-size: 1.8rem;
-            }
-
-            .subtitle {
-                font-size: 0.9rem;
-                margin-bottom: 30px;
-            }
-
-            .role-option i {
-                font-size: 1.8rem;
-            }
-
-            .role-option span {
-                font-size: 0.8rem;
-            }
-
-            .form-group label {
-                font-size: 0.85rem;
-            }
-
-            .form-group input {
-                padding: 10px 12px;
-                font-size: 0.9rem;
-            }
-
-            .signup-button#signupBtn {
-                padding: 12px 20px;
-                font-size: 1rem;
-            }
-        }
->>>>>>> aaff31c3720a0050e3afa90d742aebadeb971ff5
     </style>
+
 </head>
 <body>
 
     <header class="navbar">
         <div class="container">
-<<<<<<< HEAD
-            <div class="header-row">
-                <div class="logo-title">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Learnex Logo" width="40" height="40" style="object-fit:contain;" loading="lazy">
-                    <span class="site-title">Learnex</span>
-                </div>
-                <a href="{{ url_for('login') }}" class="login-button mobile-login">login</a>
-            </div>
-
-        </div>
-           
-=======
             <div class="logo">
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Learnex Logo" width="48" height="48" style="object-fit:contain;" loading="lazy">
                 Learnex
@@ -647,7 +618,6 @@
                 <a href="{{ url_for('login') }}" class="login-button">login</a>
             </nav>
         </div>
->>>>>>> aaff31c3720a0050e3afa90d742aebadeb971ff5
     </header>
 
     <div class="page-content">
@@ -796,6 +766,16 @@
                 updateSlider(initialActiveRole);
             }
         });
+
+    // Show Flask flash messages as popups
+    document.addEventListener('DOMContentLoaded', function() {
+        var messages = JSON.parse('{{ get_flashed_messages(with_categories=true) | tojson | safe }}');
+        if (messages.length > 0) {
+            var msg = messages.map(function(m) { return m[1]; }).join('\n');
+            alert(msg);
+        }
+    });
+
     </script>
 </body>
 </html>
