@@ -441,6 +441,7 @@
 
                 @media (max-width: 600px) {
             .login-container {
+<<<<<<< HEAD
                 margin: 10px;
                 padding: 16px 8px;
                 max-width: 98vw;
@@ -527,11 +528,42 @@
                 }
             }
 
+=======
+                margin: 20px;
+                padding: 30px;
+            }
+
+            .login-container h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 30px;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+            }
+
+            .form-group input {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+
+            .login-button {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+        }
+
+>>>>>>> aaff31c3720a0050e3afa90d742aebadeb971ff5
     </style>
 </head>
 <body>
     <header class="navbar">
         <div class="container">
+<<<<<<< HEAD
             <div class="header-row">
                 <div class="logo-title">
                     <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Learnex Logo" width="40" height="40" style="object-fit:contain;" loading="lazy">
@@ -542,6 +574,22 @@
  
         </div>
           
+=======
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Learnex Logo" width="48" height="48" style="object-fit:contain;" loading="lazy">
+                Learnex
+            </div>
+            <nav>
+                <ul>
+                        <li><a href="{{ url_for('index') }}" class="{% if request.endpoint == 'index' %}active{% endif %}">Home</a></li>
+                        <li><a href="{{ url_for('stories') }}" class="{% if request.endpoint == 'stories' %}active{% endif %}">Stories</a></li>
+                        <li><a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">About</a></li>
+                        <li><a href="{{ url_for('contact') }}" class="{% if request.endpoint == 'contact' %}active{% endif %}">Contact</a></li>
+                </ul>
+                <a href="{{ url_for('signup') }}" class="signup-button">Sign Up</a>
+            </nav>
+        </div>
+>>>>>>> aaff31c3720a0050e3afa90d742aebadeb971ff5
     </header>
     <div class="page-content">
         <div class="login-container">

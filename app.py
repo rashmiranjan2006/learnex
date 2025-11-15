@@ -79,11 +79,13 @@ def signup():
         except sqlite3.IntegrityError:
             flash('Email already registered.', 'danger')
     return render_template('signup.html')
+
 @app.route('/logout')
 def logout():
     session.clear()
     flash('Logged out successfully.', 'info')
     return redirect(url_for('login'))
+
 @app.route('/student-dashboard')
 def student_dashboard():
     if 'student_id' not in session:
@@ -108,7 +110,6 @@ def terms():
 def yes():
     return render_template('yes.html')
 
-
 # Use before_request to ensure DB is initialized (compatible with all Flask versions)
 @app.before_request
 def initialize_database():
@@ -117,6 +118,5 @@ def initialize_database():
         app.db_initialized = True
 
 app.register_blueprint(profile_bp)
-
 if __name__ == '__main__':
     app.run(debug=True)
