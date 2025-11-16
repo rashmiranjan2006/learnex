@@ -39,4 +39,4 @@ def update_profile():
     session['student_name'] = name
     session['student_email'] = email
     flash('Profile updated successfully!', 'success')
-    return redirect(url_for('student_dashboard'))
+    return redirect(url_for('student_dashboard', view='profile'))
